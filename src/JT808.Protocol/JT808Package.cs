@@ -75,6 +75,51 @@ namespace JT808.Protocol
             }
         }
 
+        //////////////////////////////////////////////////////////////////////////
+        //  [7/23/2020 xuehu]
+
+        /// <summary>
+        /// 设备平台号
+        /// </summary>
+        public string PlatformId { get; set; }
+
+        /// <summary>
+        /// 设备记录的主键
+        /// </summary>
+        public Int32 DeviceKey { get; set; } = Int32.MinValue;
+
+        /// <summary>
+        /// 指令发出时间，基于设备时区
+        /// </summary>
+        /// <remarks>
+        /// JT808的消息头里没有时间字段，只能用ServerTime和SendTimeZone换算。
+        /// 某些带时间参数的指令其文档规定都是UTC+8时区, 海康G4是否遵守此标准？？？
+        /// </remarks>
+        public DateTime SendTime { get; set; }
+
+        /// <summary>
+        /// 指令发出时间的时区
+        /// </summary>
+        public TimeZoneInfo SendTimeZone { get; set; }
+
+        /// <summary>
+        /// 指令被服务器接收到的时间(UTC)
+        /// </summary>
+        public DateTime ServerTime { get; set; }
+
+        /// <summary>
+        /// 设备所属的学校记录主键
+        /// </summary>
+        public Int32 SchoolId { get; set; } = Int32.MinValue;
+
+        /// <summary>
+        /// 设备所属的学校名
+        /// </summary>
+        public string SchoolName { get; set; }
+
+        //////////////////////////////////////////////////////////////////////////
+
+
         public JT808Package Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             // 1. 验证校验和

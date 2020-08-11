@@ -2,6 +2,7 @@
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using System;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -9,7 +10,7 @@ namespace JT808.Protocol.MessageBody
     /// <summary>
     /// 位置信息查询应答
     /// </summary>
-    public class JT808_0x0201 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0201>, IJT808Analyze
+    public class JT808_0x0201 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0201>, IJT808Analyze, IJT808GpsTime
     {
         public override ushort MsgId { get; } = 0x0201;
         public override string Description => "位置信息查询应答";
@@ -23,6 +24,15 @@ namespace JT808.Protocol.MessageBody
         /// 位置信息汇报见 8.12
         /// </summary>
         public JT808_0x0200 Position { get; set; }
+
+        /// <summary>
+        /// YY-MM-DD-hh-mm-ss（GMT+8 时间，本标准中之后涉及的时间均采用此时区）
+        /// </summary>
+        public DateTime GPSTime
+        {
+            get { return Position.GPSTime; }
+            set => throw new NotSupportedException("Message 0x0201 doesn't support set GPSTime property");
+        }
 
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {

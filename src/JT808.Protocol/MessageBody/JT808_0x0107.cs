@@ -3,6 +3,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Text.Json;
@@ -12,6 +13,7 @@ namespace JT808.Protocol.MessageBody
     /// <summary>
     /// 查询终端属性应答
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x0107 : JT808Bodies,IJT808MessagePackFormatter<JT808_0x0107>, IJT808_2019_Version,IJT808Analyze
     {
         public override ushort MsgId { get; } = 0x0107;
@@ -26,48 +28,64 @@ namespace JT808.Protocol.MessageBody
         /// bit6，0：不支持硬盘录像，1：支持硬盘录像；
         /// bit7，0：一体机，1：分体机
         /// </summary>
+        [JsonProperty("dvr_usage")]
         public ushort TerminalType { get; set; }
+
         /// <summary>
         /// 制造商 ID
         /// 2013版本 5 个字节，终端制造商编码
         /// 2019版本 11 个字节，终端制造商编码
         /// </summary>
+        [JsonProperty("manu_id")]
         public string MakerId { get; set; }
+
         /// <summary>
         /// 终端型号
         /// BYTE[20] 20 个字节，此终端型号由制造商自行定义，位数不足时，后补“0X00”。
         /// 2019版本
         /// BYTE[30] 30 个字节，此终端型号由制造商自行定义，位数不足时，后补“0X00”。
         /// </summary>
+        [JsonProperty("dvr_type")]
         public string TerminalModel { get; set; }
+
         /// <summary>
         /// 终端ID 
         /// BYTE[7]  7 个字节，由大写字母和数字组成，此终端 ID 由制造商自行定义，位数不足时，后补“0X00”
         /// 2019版本
         /// BYTE[30]  30 个字节，由大写字母和数字组成，此终端 ID 由制造商自行定义，位数不足时，后补“0X00”
         /// </summary>
+        [JsonProperty("dvr_id")]
         public string TerminalId { get; set; }
+
         /// <summary>
         /// 终端 SIM 卡 ICCID
         /// BCD[10]
         /// </summary>
+        [JsonProperty("sim_card")]
         public string Terminal_SIM_ICCID { get; set; }
+
         /// <summary>
         /// 终端硬件版本号长度
         /// </summary>
         public byte Terminal_Hardware_Version_Length { get; set; }
+
         /// <summary>
         /// 终端硬件版本号
         /// </summary>
+        [JsonProperty("firm_ver")]
         public string Terminal_Hardware_Version_Num { get; set; }
+
         /// <summary>
         /// 终端固件版本号长度
         /// </summary>
         public byte Terminal_Firmware_Version_Length { get; set; }
+
         /// <summary>
         /// 终端固件版本号
         /// </summary>
+        [JsonProperty("firmware_ver")]
         public string Terminal_Firmware_Version_Num { get; set; }
+
         /// <summary>
         /// GNSS 模块属性
         /// bit0，0：不支持 GPS 定位， 1：支持 GPS 定位；
@@ -75,7 +93,9 @@ namespace JT808.Protocol.MessageBody
         /// bit2，0：不支持 GLONASS 定位， 1：支持 GLONASS 定位；
         /// bit3，0：不支持 Galileo 定位， 1：支持 Galileo 定位
         /// </summary>
+        [JsonProperty("GNSS")]
         public byte GNSSModule { get; set; }
+
         /// <summary>
         /// 通信模块属性
         /// bit0，0：不支持GPRS通信， 1：支持GPRS通信；
@@ -86,6 +106,7 @@ namespace JT808.Protocol.MessageBody
         /// bit5，0：不支持TD-LTE通信， 1：支持TD-LTE通信；
         /// bit7，0：不支持其他通信方式， 1：支持其他通信方式
         /// </summary>
+        [JsonProperty("comm_mod")]
         public byte CommunicationModule { get; set; }
 
         public JT808_0x0107 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)

@@ -823,30 +823,21 @@
             成功/确认
             </summary>
         </member>
-        <member name="F:JT808.Protocol.Enums.JT808TerminalResult.Fail">
-            <summary>
-            失败
-            </summary>
-        </member>
-        <member name="F:JT808.Protocol.Enums.JT808TerminalResult.MessageError">
-            <summary>
-            消息有误
-            </summary>
-        </member>
-        <member name="F:JT808.Protocol.Enums.JT808TerminalResult.NotSupport">
-            <summary>
-            不支持
-            </summary>
-        </member>
         <member name="T:JT808.Protocol.Enums.JT808UpgradeResult">
             <summary>
             升级结果
             </summary>
         </member>
+        <member name="F:JT808.Protocol.Enums.JT808UpgradeResult.未找到目标设备">
+            以下为苏标扩展
+        </member>
         <member name="T:JT808.Protocol.Enums.JT808UpgradeType">
             <summary>
             升级类型
             </summary>
+        </member>
+        <member name="F:JT808.Protocol.Enums.JT808UpgradeType.高级驾驶辅助系统">
+            以下为苏标扩展
         </member>
         <member name="T:JT808.Protocol.Extensions.JT808EnumExtensions">
             <summary>
@@ -3454,6 +3445,45 @@
             808版本号
             </summary>
         </member>
+        <member name="P:JT808.Protocol.JT808Package.PlatformId">
+            <summary>
+            设备平台号
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.DeviceKey">
+            <summary>
+            设备记录的主键
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.SendTime">
+            <summary>
+            指令发出时间，基于设备时区
+            </summary>
+            <remarks>
+            JT808的消息头里没有时间字段，只能用ServerTime和SendTimeZone换算。
+            某些带时间参数的指令其文档规定都是UTC+8时区, 海康G4是否遵守此标准？？？
+            </remarks>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.SendTimeZone">
+            <summary>
+            指令发出时间的时区
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.ServerTime">
+            <summary>
+            指令被服务器接收到的时间(UTC)
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.SchoolId">
+            <summary>
+            设备所属的学校记录主键
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.SchoolName">
+            <summary>
+            设备所属的学校名
+            </summary>
+        </member>
         <member name="M:JT808.Protocol.JT808Serializer.HeaderDeserialize(System.ReadOnlySpan{System.Byte},JT808.Protocol.Enums.JT808Version,System.Int32)">
             <summary>
             用于负载或者分布式的时候，在网关只需要解到头部。
@@ -5026,6 +5056,11 @@
         <member name="P:JT808.Protocol.MessageBody.JT808_0x0201.Position">
             <summary>
             位置信息汇报见 8.12
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0x0201.GPSTime">
+            <summary>
+            YY-MM-DD-hh-mm-ss（GMT+8 时间，本标准中之后涉及的时间均采用此时区）
             </summary>
         </member>
         <member name="T:JT808.Protocol.MessageBody.JT808_0x0301">

@@ -14,7 +14,7 @@ namespace JT808.Protocol.MessageBody
     /// <summary>
     /// 位置信息汇报
     /// </summary>
-    public class JT808_0x0200 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0200>, IJT808Analyze
+    public class JT808_0x0200 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0200>, IJT808Analyze, IJT808GpsTime
     {
         public override ushort MsgId { get; } = 0x0200;
         public override string Description => "位置信息汇报";
@@ -80,19 +80,32 @@ namespace JT808.Protocol.MessageBody
             JT808_0x0200 jT808_0X0200 = new JT808_0x0200();
             jT808_0X0200.AlarmFlag = reader.ReadUInt32();
             jT808_0X0200.StatusFlag = reader.ReadUInt32();
+
+            /*
+             * commented by WuXuehui
+             * 经纬度肯定是正整数，且纬度标志似乎应该是右移26位
+             * 
             if (((jT808_0X0200.StatusFlag >> 28) & 1) == 1)
             {   //南纬 268435456 0x10000000
                 jT808_0X0200.Lat = (int)reader.ReadUInt32();
             }
             else
+            */
+
             {
                 jT808_0X0200.Lat = reader.ReadInt32();
             }
-            if (((jT808_0X0200.StatusFlag >> 27) & 1) == 1)
+
+            /*
+             * commented by WuXuehui
+             * 经纬度肯定是正整数
+             * 
+            if (((jT808_0X0200.StatusFlag >> 27 ) & 1) == 1)
             {   //西经 ‭134217728‬ 0x8000000
                 jT808_0X0200.Lng = (int)reader.ReadUInt32();
             }
             else
+            */
             {
                 jT808_0X0200.Lng = reader.ReadInt32();
             }

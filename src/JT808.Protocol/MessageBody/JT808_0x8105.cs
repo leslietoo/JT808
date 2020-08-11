@@ -23,6 +23,8 @@ namespace JT808.Protocol.MessageBody
         /// </summary>
         public CommandParams CommandValue { get; set; }
 
+        public string UpdateFirmwareCommand { get; set; }
+
         public JT808_0x8105 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8105 jT808_0x8105 = new JT808_0x8105
@@ -40,10 +42,28 @@ namespace JT808.Protocol.MessageBody
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8105 value, IJT808Config config)
         {
             writer.WriteByte(value.CommandWord);
+
+            // added by Wu Xuehui
+            switch (value.CommandWord)
+            {
+                case 1:
+                    writer.WriteString(UpdateFirmwareCommand);
+                    break;
+                case 2:
+                    writer.WriteString(value.CommandValue.ToString());
+
+                    break;
+                default:
+                    break;
+            }
+
+            /*
+             * commented by Wu Xuehui
             if (value.CommandWord == 1 || value.CommandWord == 2)
             {
                 writer.WriteString(value.CommandValue.ToString());
             }
+            */
         }
 
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
