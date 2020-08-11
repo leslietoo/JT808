@@ -90,11 +90,12 @@ namespace JT808.Protocol.MessageBody
                 jT808_0X0200.Lat = (int)reader.ReadUInt32();
             }
             else
-            */
-
             {
                 jT808_0X0200.Lat = reader.ReadInt32();
             }
+            */
+
+            jT808_0X0200.Lat = ((jT808_0X0200.StatusFlag & 0x04u) == 0) ? reader.ReadInt32() : -reader.ReadInt32();
 
             /*
              * commented by WuXuehui
@@ -105,10 +106,13 @@ namespace JT808.Protocol.MessageBody
                 jT808_0X0200.Lng = (int)reader.ReadUInt32();
             }
             else
-            */
             {
                 jT808_0X0200.Lng = reader.ReadInt32();
             }
+            */
+
+            jT808_0X0200.Lng = ((jT808_0X0200.StatusFlag & 0x08u) == 0) ? reader.ReadInt32() : -reader.ReadInt32();
+
             jT808_0X0200.Altitude = reader.ReadUInt16();
             jT808_0X0200.Speed = reader.ReadUInt16();
             jT808_0X0200.Direction = reader.ReadUInt16();
