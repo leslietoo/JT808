@@ -1,5 +1,7 @@
 ﻿using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;

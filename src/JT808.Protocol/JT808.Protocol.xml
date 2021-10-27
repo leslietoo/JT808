@@ -3461,7 +3461,7 @@
             </summary>
             <remarks>
             JT808的消息头里没有时间字段，只能用ServerTime和SendTimeZone换算。
-            某些带时间参数的指令其文档规定都是UTC+8时区, 海康G4是否遵守此标准？？？
+            某些带时间参数的指令其文档规定都是UTC+8时区, 但G4/特思威尔并未遵守此标准，是基于设备本地时区的
             </remarks>
         </member>
         <member name="P:JT808.Protocol.JT808Package.SendTimeZone">
