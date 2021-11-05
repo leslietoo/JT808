@@ -13,7 +13,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8801 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8801>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x8801
+        /// </summary>
         public override ushort MsgId { get; } = 0x8801;
+        /// <summary>
+        /// 摄像头立即拍摄命令
+        /// </summary>
         public override string Description => "摄像头立即拍摄命令";
         /// <summary>
         /// 通道 ID
@@ -32,6 +38,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 保存标志 
         /// 1：保存；0：实时上传
+        /// 仅主机拍照时有效
         /// </summary>
         public byte SaveFlag { get; set; }
         /// <summary>
@@ -64,7 +71,12 @@ namespace JT808.Protocol.MessageBody
         /// 0-255
         /// </summary>
         public byte Chroma { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8801 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8801 jT808_0X8801 = new JT808_0x8801();
@@ -80,7 +92,12 @@ namespace JT808.Protocol.MessageBody
             jT808_0X8801.Chroma = reader.ReadByte();
             return jT808_0X8801;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8801 value, IJT808Config config)
         {
             writer.WriteByte(value.ChannelId);
@@ -94,7 +111,12 @@ namespace JT808.Protocol.MessageBody
             writer.WriteByte(value.Saturability);
             writer.WriteByte(value.Chroma);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8801 value = new JT808_0x8801();

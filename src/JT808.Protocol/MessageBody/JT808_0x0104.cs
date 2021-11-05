@@ -14,7 +14,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x0104 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0104>, IJT808Analyze
     {
+        /// <summary>
+        /// 0x0104
+        /// </summary>
         public override ushort MsgId { get; } = 0x0104;
+        /// <summary>
+        /// 查询终端参数应答
+        /// </summary>
         public override string Description => "查询终端参数应答";
         /// <summary>
         /// 应答流水号
@@ -29,7 +35,12 @@ namespace JT808.Protocol.MessageBody
         /// 参数列表
         /// </summary>
         public IList<JT808_0x8103_BodyBase> ParamList { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x0104 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x0104 jT808_0x0104 = new JT808_0x0104();
@@ -46,13 +57,24 @@ namespace JT808.Protocol.MessageBody
                     }
                     else
                     {
-                        jT808_0x0104.ParamList = new List<JT808_0x8103_BodyBase> { JT808MessagePackFormatterResolverExtensions.JT808DynamicDeserialize(instance,  ref reader,  config) };
+                        jT808_0x0104.ParamList = new List<JT808_0x8103_BodyBase> { JT808MessagePackFormatterResolverExtensions.JT808DynamicDeserialize(instance, ref reader, config) };
                     }
+                }
+                else {
+                    //对于未能解析的自定义项，过滤其长度，以保证后续解析正常
+                    reader.Skip(4);//跳过参数id长度
+                    var len = reader.ReadByte();//获取协议长度
+                    reader.Skip(len);//跳过协议内容
                 }
             }
             return jT808_0x0104;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x0104 value, IJT808Config config)
         {
             writer.WriteUInt16(value.MsgNum);
@@ -63,7 +85,12 @@ namespace JT808.Protocol.MessageBody
                 JT808MessagePackFormatterResolverExtensions.JT808DynamicSerialize(obj, ref writer, item, config);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x0104 jT808_0x0104 = new JT808_0x0104();

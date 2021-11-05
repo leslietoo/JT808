@@ -13,11 +13,26 @@ using System.Text;
 
 namespace JT808.Protocol.MessagePack
 {
+    /// <summary>
+    /// JT808消息读取器
+    /// </summary>
     public ref struct JT808MessagePackReader
     {
+        /// <summary>
+        /// 读取buffer
+        /// </summary>
         public ReadOnlySpan<byte> Reader { get; private set; }
+        /// <summary>
+        /// 原数据
+        /// </summary>
         public ReadOnlySpan<byte> SrcBuffer { get; }
+        /// <summary>
+        /// 读取到的数量
+        /// </summary>
         public int ReaderCount { get; private set; }
+        /// <summary>
+        /// JT808版本号
+        /// </summary>
         public JT808Version Version { get; set; }
         private byte _calculateCheckXorCode;
         private byte _realCheckXorCode;
@@ -34,7 +49,8 @@ namespace JT808.Protocol.MessagePack
         /// <summary>
         /// 解码（转义还原）,计算校验和
         /// </summary>
-        /// <param name="buffer"></param>
+        /// <param name="srcBuffer"></param>
+        /// <param name="version">默认JT808Version.JTT2013</param>
         public JT808MessagePackReader(ReadOnlySpan<byte> srcBuffer, JT808Version version = JT808Version.JTT2013)
         {
             SrcBuffer = srcBuffer;
@@ -124,77 +140,160 @@ namespace JT808.Protocol.MessagePack
             Reader = allocateBuffer.Slice(0, offset);
             _decoded = true;
         }
+        /// <summary>
+        /// 计算的校验码
+        /// </summary>
         public byte CalculateCheckXorCode => _calculateCheckXorCode;
+        /// <summary>
+        /// 实际获取的校验码
+        /// </summary>
         public byte RealCheckXorCode => _realCheckXorCode;
+        /// <summary>
+        /// 验证码是否正确
+        /// </summary>
         public bool CheckXorCodeVali => _checkXorCodeVali;
+        /// <summary>
+        /// 读取标识头
+        /// </summary>
+        /// <returns></returns>
         public byte ReadStart()=> ReadByte();
+        /// <summary>
+        /// 读取尾标识
+        /// </summary>
+        /// <returns></returns>
         public byte ReadEnd()=> ReadByte();
+        /// <summary>
+        /// 读取有符号位的两字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public short ReadInt16()
         {
             return BinaryPrimitives.ReadInt16BigEndian(GetReadOnlySpan(2));
         }
+        /// <summary>
+        /// 读取无符号位的两字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public ushort ReadUInt16()
         {
             return BinaryPrimitives.ReadUInt16BigEndian(GetReadOnlySpan(2)); 
         }
+        /// <summary>
+        /// 读取无符号位的四字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public uint ReadUInt32()
         {
             return BinaryPrimitives.ReadUInt32BigEndian(GetReadOnlySpan(4));
         }
+        /// <summary>
+        /// 读取有符号位的四字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public int ReadInt32()
         {
             return BinaryPrimitives.ReadInt32BigEndian(GetReadOnlySpan(4));
         }
+        /// <summary>
+        /// 读取无符号位的八字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public ulong ReadUInt64()
         {
             return BinaryPrimitives.ReadUInt64BigEndian(GetReadOnlySpan(8));
         }
+        /// <summary>
+        /// 读取有符号位的八字节数值类型
+        /// </summary>
+        /// <returns></returns>
         public long ReadInt64()
         {
             return BinaryPrimitives.ReadInt64BigEndian(GetReadOnlySpan(8));
         }
+        /// <summary>
+        /// 读取一个字节
+        /// </summary>
+        /// <returns></returns>
         public byte ReadByte()
         {
             return GetReadOnlySpan(1)[0];
         }
+        /// <summary>
+        /// 读取一个字符
+        /// </summary>
+        /// <returns></returns>
         public char ReadChar()
         {
             return (char)GetReadOnlySpan(1)[0];
         }
+        /// <summary>
+        /// 虚拟读取一个字节，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public byte ReadVirtualByte()
         {
             return GetVirtualReadOnlySpan(1)[0];
         }
+        /// <summary>
+        /// 虚拟读取一个数组，不计入内存偏移量
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public ReadOnlySpan<byte> ReadVirtualArray(int count)
         {
             return GetVirtualReadOnlySpan(count);
         }
+        /// <summary>
+        /// 虚拟读取无符号位的两字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public ushort ReadVirtualUInt16()
         {
             return BinaryPrimitives.ReadUInt16BigEndian(GetVirtualReadOnlySpan(2));
         }
+        /// <summary>
+        /// 虚拟读取有符号位的两字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public short ReadVirtualInt16()
         {
             return BinaryPrimitives.ReadInt16BigEndian(GetVirtualReadOnlySpan(2));
         }
+        /// <summary>
+        /// 虚拟读取无符号位的四字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public uint ReadVirtualUInt32()
         {
             return BinaryPrimitives.ReadUInt32BigEndian(GetVirtualReadOnlySpan(4));
         }
+        /// <summary>
+        /// 虚拟读取有符号位的四字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public int ReadVirtualInt32()
         {
             return BinaryPrimitives.ReadInt32BigEndian(GetVirtualReadOnlySpan(4));
         }
+        /// <summary>
+        /// 虚拟读取无符号位的八字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public ulong ReadVirtualUInt64()
         {
             return BinaryPrimitives.ReadUInt64BigEndian(GetVirtualReadOnlySpan(8));
         }
+        /// <summary>
+        /// 虚拟读取有符号位的八字节数值类型，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public long ReadVirtualInt64()
         {
             return BinaryPrimitives.ReadInt64BigEndian(GetVirtualReadOnlySpan(8));
         }
         /// <summary>
-        /// 数字编码 大端模式、高位在前
+        /// 读取数字编码 
+        /// 大端模式、高位在前
         /// </summary>
         /// <param name="len"></param>
         public string ReadBigNumber(int len)
@@ -208,30 +307,60 @@ namespace JT808.Protocol.MessagePack
             }
             return result.ToString();
         }
+        /// <summary>
+        /// 读取固定大小的内存块
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public ReadOnlySpan<byte> ReadArray(int len)
         {
             return GetReadOnlySpan(len).Slice(0, len);
         }
+        /// <summary>
+        /// 读取固定大小的内存块
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public ReadOnlySpan<byte> ReadArray(int start,int end)
         {
             return Reader.Slice(start,end);
         }
+        /// <summary>
+        /// 读取GBK字符串编码
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public string ReadString(int len)
         {
             var readOnlySpan = GetReadOnlySpan(len);
             string value = JT808Constants.Encoding.GetString(readOnlySpan.Slice(0, len).ToArray());
             return value.Trim('\0');
         }
+        /// <summary>
+        /// 读取ASCII编码
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public string ReadASCII(int len)
         {
             var readOnlySpan = GetReadOnlySpan(len);
             string value = Encoding.ASCII.GetString(readOnlySpan.Slice(0, len).ToArray());
             return value;
         }
+        /// <summary>
+        /// 读取剩余数据体内容为字符串模式
+        /// </summary>
+        /// <returns></returns>
         public string ReadRemainStringContent()
         {
             return ReadString(ReadCurrentRemainContentLength());
         }
+        /// <summary>
+        /// 读取16进制编码
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public string ReadHex(int len)
         {
             var readOnlySpan = GetReadOnlySpan(len);
@@ -239,21 +368,22 @@ namespace JT808.Protocol.MessagePack
             return hex;
         }
         /// <summary>
-        /// yyMMddHHmmss
+        /// 读取六字节日期,yyMMddHHmmss
         /// </summary>
-        /// <param name="fromBase">>D2： 10  X2：16</param>
+        /// <param name="format">>D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTime_yyMMddHHmmss")]
         public DateTime ReadDateTime6(string format = "X2")
         {
             DateTime d;
             try
             {
                 var readOnlySpan = GetReadOnlySpan(6);
-                int year = Convert.ToInt32(readOnlySpan[0].ToString(format)) + JT808Constants.DateLimitYear;
-                int month = Convert.ToInt32(readOnlySpan[1].ToString(format));
-                int day = Convert.ToInt32(readOnlySpan[2].ToString(format));
-                int hour = Convert.ToInt32(readOnlySpan[3].ToString(format));
-                int minute = Convert.ToInt32(readOnlySpan[4].ToString(format));
-                int second = Convert.ToInt32(readOnlySpan[5].ToString(format));
+                int year = BcdToInt(readOnlySpan[0])  + JT808Constants.DateLimitYear;
+                int month = BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                int hour = BcdToInt(readOnlySpan[3]);
+                int minute = BcdToInt(readOnlySpan[4]);
+                int second = BcdToInt(readOnlySpan[5]);
                 d = new DateTime(year, month, day, hour, minute, second);
             }
             catch (Exception)
@@ -263,27 +393,109 @@ namespace JT808.Protocol.MessagePack
             return d;
         }
         /// <summary>
-        /// HH-mm-ss-msms
-        /// HH-mm-ss-fff
+        /// 读取六字节日期,yyMMddHHmmss
+        /// </summary>
+        public DateTime ReadDateTime_yyMMddHHmmss()
+        {
+            DateTime d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(6);
+                int year = BcdToInt(readOnlySpan[0]) + JT808Constants.DateLimitYear;
+                int month = BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                int hour = BcdToInt(readOnlySpan[3]);
+                int minute = BcdToInt(readOnlySpan[4]);
+                int second = BcdToInt(readOnlySpan[5]);
+                d = new DateTime(year, month, day, hour, minute, second);
+            }
+            catch (Exception)
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 16进制的BCD BYTE转成整型
+        /// </summary>
+        /// <param name="value">16进制的BCD BYTE转成整型</param>
+        /// <returns></returns>
+        public int BcdToInt(byte value)
+        {
+            int high = value >> 4;
+            int low = value & 0xF;
+            int number = 10 * high + low;
+            return number;
+        }
+        /// <summary>
+        /// 读取可空类型的六字节日期,yyMMddHHmmss
+        /// </summary>
+        /// <param name="format">>D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTimeNull_yyMMddHHmmss")]
+        public DateTime? ReadDateTimeNull6(string format = "X2")
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(6);
+                int year = BcdToInt(readOnlySpan[0]);
+                int month = BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                int hour = BcdToInt(readOnlySpan[3]);
+                int minute = BcdToInt(readOnlySpan[4]);
+                int second = BcdToInt(readOnlySpan[5]);
+                if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0 && second == 0) return null;
+                d = new DateTime(year + JT808Constants.DateLimitYear, month, day, hour, minute, second);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的六字节日期,yyMMddHHmmss
+        /// </summary>
+        public DateTime? ReadDateTimeNull_yyMMddHHmmss()
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(6);
+                int year = BcdToInt(readOnlySpan[0]);
+                int month = BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                int hour = BcdToInt(readOnlySpan[3]);
+                int minute = BcdToInt(readOnlySpan[4]);
+                int second = BcdToInt(readOnlySpan[5]);
+                if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0 && second == 0) return null;
+                d = new DateTime(year + JT808Constants.DateLimitYear, month, day, hour, minute, second);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取五字节日期,HH-mm-ss-msms|HH-mm-ss-fff
         /// </summary>
         /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTime_HHmmssfff")]
         public DateTime ReadDateTime5(string format = "X2")
         {
             DateTime d;
             try
             {
                 var readOnlySpan = GetReadOnlySpan(5);
-                StringBuilder sb = new StringBuilder(4);
-                sb.Append(readOnlySpan[3].ToString("X2"));
-                sb.Append(readOnlySpan[4].ToString("X2"));
+                var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
                 d = new DateTime(
                 DateTime.Now.Year,
                 DateTime.Now.Month,
                 DateTime.Now.Day,
-                Convert.ToInt32(readOnlySpan[0].ToString(format)),
-                Convert.ToInt32(readOnlySpan[1].ToString(format)),
-                Convert.ToInt32(readOnlySpan[2].ToString(format)),
-                Convert.ToInt32(sb.ToString().TrimStart()));
+                BcdToInt(readOnlySpan[0]),
+                BcdToInt(readOnlySpan[1]),
+                BcdToInt(readOnlySpan[2]), fff);
             }
             catch
             {
@@ -292,22 +504,105 @@ namespace JT808.Protocol.MessagePack
             return d;
         }
         /// <summary>
-        /// YYYYMMDD
+        /// 读取五字节日期,HH-mm-ss-msms|HH-mm-ss-fff
+        /// </summary>
+        public DateTime ReadDateTime_HHmmssfff()
+        {
+            DateTime d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(5);
+                var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
+                d = new DateTime(
+                DateTime.Now.Year,
+                DateTime.Now.Month,
+                DateTime.Now.Day,
+                BcdToInt(readOnlySpan[0]),
+                BcdToInt(readOnlySpan[1]),
+                BcdToInt(readOnlySpan[2]), fff);
+            }
+            catch
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的五字节日期,HH-mm-ss-msms|HH-mm-ss-fff
         /// </summary>
         /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTimeNull_HHmmssfff")]
+        public DateTime? ReadDateTimeNull5(string format = "X2")
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(5);
+                int hour = BcdToInt(readOnlySpan[0]);
+                int minute = BcdToInt(readOnlySpan[1]);
+                int second = BcdToInt(readOnlySpan[2]);
+                var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
+                if (hour == 0 && minute == 0 && second == 0 && fff == 0) return null;
+                d = new DateTime(
+                DateTime.Now.Year,
+                DateTime.Now.Month,
+                DateTime.Now.Day,
+                hour,
+                minute,
+                second,
+                fff);
+            }
+            catch
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的五字节日期,HH-mm-ss-msms|HH-mm-ss-fff
+        /// </summary>
+        public DateTime? ReadDateTimeNull_HHmmssfff()
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(5);
+                int hour = BcdToInt(readOnlySpan[0]);
+                int minute = BcdToInt(readOnlySpan[1]);
+                int second = BcdToInt(readOnlySpan[2]);
+                var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
+                if (hour == 0 && minute == 0 && second == 0 && fff == 0) return null;
+                d = new DateTime(
+                DateTime.Now.Year,
+                DateTime.Now.Month,
+                DateTime.Now.Day,
+                hour,
+                minute,
+                second,
+                fff);
+            }
+            catch
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取四字节日期，YYYYMMDD
+        /// </summary>
+        /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTime_YYYYMMDD")]
         public DateTime ReadDateTime4(string format = "X2")
         {
             DateTime d;
             try
             {
                 var readOnlySpan = GetReadOnlySpan(4);
-                StringBuilder sb = new StringBuilder(4);
-                sb.Append(readOnlySpan[0].ToString("X2"));
-                sb.Append(readOnlySpan[1].ToString("X2"));
+                var year = BcdToInt(readOnlySpan[0]) * 100 + BcdToInt(readOnlySpan[1]);
                 d = new DateTime(
-                Convert.ToInt32(sb.ToString()),
-                Convert.ToInt32(readOnlySpan[2].ToString(format)),
-                Convert.ToInt32(readOnlySpan[3].ToString(format)));
+                    year, 
+                    BcdToInt(readOnlySpan[2]),
+                    BcdToInt(readOnlySpan[3]));
             }
             catch (Exception)
             {
@@ -316,19 +611,19 @@ namespace JT808.Protocol.MessagePack
             return d;   
         }
         /// <summary>
-        /// YYMMDD
+        /// 读取四字节日期，YYYYMMDD
         /// </summary>
-        /// <param name="format">D2： 10  X2：16</param>
-        public DateTime ReadDateTime3(string format = "X2")
+        public DateTime ReadDateTime_YYYYMMDD()
         {
             DateTime d;
             try
             {
-                var readOnlySpan = GetReadOnlySpan(3);
+                var readOnlySpan = GetReadOnlySpan(4);
+                var year = BcdToInt(readOnlySpan[0]) * 100 + BcdToInt(readOnlySpan[1]);
                 d = new DateTime(
-                Convert.ToInt32(readOnlySpan[0].ToString(format)) + JT808Constants.DateLimitYear,
-                Convert.ToInt32(readOnlySpan[1].ToString(format)),
-                Convert.ToInt32(readOnlySpan[2].ToString(format)));
+                    year,
+                    BcdToInt(readOnlySpan[2]),
+                    BcdToInt(readOnlySpan[3]));
             }
             catch (Exception)
             {
@@ -336,6 +631,144 @@ namespace JT808.Protocol.MessagePack
             }
             return d;
         }
+        /// <summary>
+        /// 读取可空类型的四字节日期，YYYYMMDD
+        /// </summary>
+        /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTimeNull_YYYYMMDD")]
+        public DateTime? ReadDateTimeNull4(string format = "X2")
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(4);
+                var year = BcdToInt(readOnlySpan[0]) * 100 + BcdToInt(readOnlySpan[1]);
+                int month = BcdToInt(readOnlySpan[2]);
+                int day = BcdToInt(readOnlySpan[3]);
+                if (year == 0 && month == 0 && day == 0) return null;
+                d = new DateTime(year, month, day);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的四字节日期，YYYYMMDD
+        /// </summary>
+        public DateTime? ReadDateTimeNull_YYYYMMDD()
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(4);
+                var year = BcdToInt(readOnlySpan[0]) * 100 + BcdToInt(readOnlySpan[1]);
+                int month = BcdToInt(readOnlySpan[2]);
+                int day = BcdToInt(readOnlySpan[3]);
+                if (year == 0 && month == 0 && day == 0) return null;
+                d = new DateTime(year, month, day);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取三字节日期，YYMMDD
+        /// </summary>
+        /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTime_YYMMDD")]
+        public DateTime ReadDateTime3(string format = "X2")
+        {
+            DateTime d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(3);
+                d = new DateTime(
+                BcdToInt(readOnlySpan[0]) + JT808Constants.DateLimitYear,
+                BcdToInt(readOnlySpan[1]),
+                BcdToInt(readOnlySpan[2]));
+            }
+            catch (Exception)
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取三字节日期，YYMMDD
+        /// </summary>
+        public DateTime ReadDateTime_YYMMDD()
+        {
+            DateTime d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(3);
+                d = new DateTime(
+                BcdToInt(readOnlySpan[0]) + JT808Constants.DateLimitYear,
+                BcdToInt(readOnlySpan[1]),
+                BcdToInt(readOnlySpan[2]));
+            }
+            catch (Exception)
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的三字节日期，YYMMDD
+        /// </summary>
+        /// <param name="format">D2： 10  X2：16</param>
+        [Obsolete("use ReadDateTimeNull_YYMMDD")]
+        public DateTime? ReadDateTimeNull3(string format = "X2")
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(3);
+                int year = BcdToInt(readOnlySpan[0]);
+                int month= BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                if (year == 0 && month == 0 && day == 0) return null;
+                d = new DateTime(
+                 year + JT808Constants.DateLimitYear, month,day
+                );
+            }
+            catch (Exception)
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取可空类型的三字节日期，YYMMDD
+        /// </summary>
+        public DateTime? ReadDateTimeNull_YYMMDD()
+        {
+            DateTime? d;
+            try
+            {
+                var readOnlySpan = GetReadOnlySpan(3);
+                int year = BcdToInt(readOnlySpan[0]);
+                int month = BcdToInt(readOnlySpan[1]);
+                int day = BcdToInt(readOnlySpan[2]);
+                if (year == 0 && month == 0 && day == 0) return null;
+                d = new DateTime(
+                 year + JT808Constants.DateLimitYear, month, day
+                );
+            }
+            catch (Exception)
+            {
+                d = JT808Constants.UTCBaseTime;
+            }
+            return d;
+        }
+        /// <summary>
+        /// 读取UTC时间类型
+        /// </summary>
+        /// <returns></returns>
         public DateTime ReadUTCDateTime()
         {
             DateTime d;
@@ -356,6 +789,12 @@ namespace JT808.Protocol.MessagePack
             }
             return d;
         }
+        /// <summary>
+        /// 读取BCD编码
+        /// </summary>
+        /// <param name="len"></param>
+        /// <param name="trim"></param>
+        /// <returns></returns>
         public string ReadBCD(int len , bool trim = true)
         {
             int count = len / 2;
@@ -374,15 +813,30 @@ namespace JT808.Protocol.MessagePack
                 return bcdSb.ToString();
             }  
         }
+        /// <summary>
+        /// 读取数量大小的内存块
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         private ReadOnlySpan<byte> GetReadOnlySpan(int count)
         {
             ReaderCount += count;
             return Reader.Slice(ReaderCount - count);
         }
+        /// <summary>
+        /// 虚拟读取数量大小的内存块，不计入内存偏移量
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public ReadOnlySpan<byte> GetVirtualReadOnlySpan(int count)
         {
             return Reader.Slice(ReaderCount, count);
         }
+        /// <summary>
+        /// 读取数据体内存块
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public ReadOnlySpan<byte> ReadContent(int count=0)
         {
             if (_decoded)
@@ -400,6 +854,10 @@ namespace JT808.Protocol.MessagePack
                 return Reader.Slice(ReaderCount);
             }
         }
+        /// <summary>
+        /// 读取一整串字符串到\0结束
+        /// </summary>
+        /// <returns></returns>
         public string ReadStringEndChar0()
         {
             var remainSpans = Reader.Slice(ReaderCount, ReadCurrentRemainContentLength());
@@ -407,12 +865,20 @@ namespace JT808.Protocol.MessagePack
             string value = JT808Constants.Encoding.GetString(ReadArray(length).ToArray());
             return value.Trim('\0');
         }
+        /// <summary>
+        /// 虚拟读取一整串字符串到\0结束，不计入内存偏移量
+        /// </summary>
+        /// <returns></returns>
         public string ReadVirtualStringEndChar0()
         {
             var remainSpans = Reader.Slice(ReaderCount);
             string value = JT808Constants.Encoding.GetString(GetVirtualReadOnlySpan(remainSpans.IndexOf((byte)'\0') + 1).ToArray());
             return value.Trim('\0');
         }
+        /// <summary>
+        /// 读取剩余数据体内容长度
+        /// </summary>
+        /// <returns></returns>
         public int ReadCurrentRemainContentLength()
         {
             if (_decoded)
@@ -425,10 +891,19 @@ namespace JT808.Protocol.MessagePack
                 return Reader.Length - ReaderCount;
             }
         }
+        /// <summary>
+        /// 跳过多少字节
+        /// </summary>
+        /// <param name="count"></param>
         public void Skip(int count=1)
         {
             ReaderCount += count;
         }
+        /// <summary>
+        /// 读取JT19056校验码
+        /// </summary>
+        /// <param name="currentPosition"></param>
+        /// <returns></returns>
         public (byte CalculateXorCheckCode, byte RealXorCheckCode) ReadCarDVRCheckCode(int currentPosition)
         {
             var reader = Reader.Slice(currentPosition, ReaderCount - currentPosition);

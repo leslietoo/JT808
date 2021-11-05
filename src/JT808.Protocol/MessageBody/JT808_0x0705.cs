@@ -16,7 +16,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x0705 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0705>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x0705
+        /// </summary>
         public override ushort MsgId { get; } = 0x0705;
+        /// <summary>
+        /// CAN总线数据上传
+        /// </summary>
         public override string Description => "CAN总线数据上传";
         /// <summary>
         /// 数据项个数
@@ -32,14 +38,19 @@ namespace JT808.Protocol.MessageBody
         /// CAN 总线数据项
         /// </summary>
         public List<JT808CanProperty> CanItems { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x0705 value = new JT808_0x0705();
             value.CanItemCount = reader.ReadUInt16();
             writer.WriteNumber($"[{value.CanItemCount.ReadNumber()}]数据项个数", value.CanItemCount);
             var dateTimeBuffer = reader.ReadVirtualArray(5).ToArray();
-            value.FirstCanReceiveTime = reader.ReadDateTime5();
+            value.FirstCanReceiveTime = reader.ReadDateTime_HHmmssfff();
             writer.WriteString($"[{dateTimeBuffer.ToHexString()}]CAN总线数据接收时间", value.FirstCanReceiveTime.ToString("HH-mm-ss:fff"));
             writer.WriteStartArray("CAN总线数据项");
             for (var i = 0; i < value.CanItemCount; i++)
@@ -58,12 +69,17 @@ namespace JT808.Protocol.MessageBody
             }
             writer.WriteEndArray();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x0705 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x0705 value = new JT808_0x0705();
             value.CanItemCount = reader.ReadUInt16();
-            value.FirstCanReceiveTime = reader.ReadDateTime5();
+            value.FirstCanReceiveTime = reader.ReadDateTime_HHmmssfff();
             value.CanItems = new List<JT808CanProperty>();
             for (var i = 0; i < value.CanItemCount; i++)
             {
@@ -78,13 +94,18 @@ namespace JT808.Protocol.MessageBody
             }
             return value;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x0705 value, IJT808Config config)
         {
             if (value.CanItems != null && value.CanItems.Count > 0)
             {
                 writer.WriteUInt16((ushort)value.CanItems.Count);
-                writer.WriteDateTime5(value.FirstCanReceiveTime);
+                writer.WriteDateTime_HHmmssfff(value.FirstCanReceiveTime);
                 foreach (var item in value.CanItems)
                 {
                     writer.WriteUInt32(item.CanId);

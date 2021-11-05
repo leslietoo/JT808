@@ -43,7 +43,7 @@ namespace JT808.Protocol.Test.MessageBody
             bytes = "000104557A04000800200323101010003201".ToHexBytes();
             value = JT808Serializer.Analyze<JT808_0x0700>(bytes);
             //0x05
-            bytes = "000105557A050027003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B5000009".ToHexBytes();
+            bytes = "000105557A050029003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B50000000007".ToHexBytes();
             value = JT808Serializer.Analyze<JT808_0x0700>(bytes);
             //0x06
             bytes = "000106557A06005700200323101010FFD7D4B6A8D2E531000000D7D4B6A8D2E532000000D7D4B6A8D2E533000000BDFCB9E2B5C600000000D4B6B9E2B5C600000000D3D2D7AACFF200000000D7F3D7AACFF200000000D6C6B6AF00000000000084".ToHexBytes();
@@ -249,13 +249,13 @@ namespace JT808.Protocol.Test.MessageBody
             };
 
             var hex = JT808Serializer.Serialize(value).ToHexString();
-            Assert.Equal("000105557A050027003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B5000009", hex);
+            Assert.Equal("000105557A050029003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B50000000007", hex);
         }
 
         [Fact]
         public void Test_Deserilize_0x05()
         {
-            byte[] bytes = "000105557A050027003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B5000009".ToHexBytes();
+            byte[] bytes = "000105557A050029003132333435363738393132333435363738D4C142313233343500000000D6D8D0CDBBF5B3B50000000007".ToHexBytes();
             JT808_0x0700 value = JT808Serializer.Deserialize<JT808_0x0700>(bytes);
             Assert.Equal(1, value.ReplyMsgNum);
             var body = value.JT808CarDVRUpPackage.Bodies as JT808_CarDVR_Up_0x05;
@@ -666,6 +666,7 @@ namespace JT808.Protocol.Test.MessageBody
             Assert.Equal(50, body.JT808_CarDVR_Up_0x15_SpeedStatusLogs[0].JT808_CarDVR_Up_0x15_SpeedPerSeconds[0].RecordSpeed);
             Assert.Equal(40, body.JT808_CarDVR_Up_0x15_SpeedStatusLogs[0].JT808_CarDVR_Up_0x15_SpeedPerSeconds[0].ReferenceSpeed);
         }
+
         [Fact]
         public void Test_Serialize_0x82()
         {
@@ -688,6 +689,36 @@ namespace JT808.Protocol.Test.MessageBody
             JT808_0x0700 value = JT808Serializer.Deserialize<JT808_0x0700>(bytes);
             Assert.Equal(1, value.ReplyMsgNum);
             var body = value.JT808CarDVRUpPackage.Bodies as JT808_CarDVR_Up_0x82;
+        }
+
+        [Fact]
+        public void Test_Serialize_Error()
+        {
+            JT808_0x0700 value = new JT808_0x0700();
+            value.CommandId = 0xFA;
+            value.ReplyMsgNum = 1;
+            value.JT808CarDVRUpPackage = new JT808CarDVRUpPackage
+            {
+                CommandId = 0xFA
+            };
+            var hex = JT808Serializer.Serialize(value).ToHexString();
+            Assert.Equal("0001FA557AFA00D5", hex);
+        }
+
+        [Fact]
+        public void Test_Deserilize_Error()
+        {
+            byte[] bytes = "0001FA557AFA00D5".ToHexBytes();
+            JT808_0x0700 value = JT808Serializer.Deserialize<JT808_0x0700>(bytes);
+            Assert.Equal(1, value.ReplyMsgNum);
+            Assert.True(value.JT808CarDVRUpPackage.ErrorFlag);
+        }
+
+        [Fact]
+        public void Test_Json_Error()
+        {
+            byte[] bytes = "0001FA557AFA00D5".ToHexBytes();
+            string json = JT808Serializer.Analyze<JT808_0x0700>(bytes);
         }
     }
 }

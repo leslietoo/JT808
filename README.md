@@ -1,5 +1,6 @@
 ﻿# JT808协议
 
+
 [![MIT Licence](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/SmallChi/JT808/blob/master/LICENSE)![.NET Core](https://github.com/SmallChi/JT808/workflows/.NET%20Core/badge.svg?branch=master)
 
 ## 前提条件
@@ -17,9 +18,9 @@
 
 ### 数据包[JT808Package]
 
-| 头标识 | 数据头       | 数据体      | 校验码    | 尾标识 |
+| 头标识 | 数据头       | 数据体/分包数据体      | 校验码    | 尾标识 |
 | :----: | :---------: |  :---------: | :----------: | :----: |
-| Begin  | JT808Header |  JT808Bodies |CheckCode | End    |
+| Begin  | JT808Header |  JT808Bodies/JT808SubDataBodies |CheckCode | End    |
 | 7E     | -           | -           | -         | 7E     |
 
 ### 数据头[JT808Header]
@@ -73,14 +74,14 @@ jT808_0x0200.Lng = 132444444;
 jT808_0x0200.Speed = 60;
 jT808_0x0200.Direction = 0;
 jT808_0x0200.StatusFlag = 2;
-jT808_0x0200.JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>();
+jT808_0x0200.BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>();
 
-jT808_0x0200.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+jT808_0x0200.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
 {
     Mileage = 100
 });
 
-jT808_0x0200.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+jT808_0x0200.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
 {
     Oil = 125
 });
@@ -161,9 +162,9 @@ Assert.Equal(60, jT808_0x0200.Speed);
 Assert.Equal(0, jT808_0x0200.Direction);
 Assert.Equal((uint)2, jT808_0x0200.StatusFlag);
 //4.1.附加信息1
-Assert.Equal(100, ((JT808_0x0200_0x01)jT808_0x0200.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
+Assert.Equal(100, ((JT808_0x0200_0x01)jT808_0x0200.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
 //4.2.附加信息2
-Assert.Equal(125, ((JT808_0x0200_0x02)jT808_0x0200.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
+Assert.Equal(125, ((JT808_0x0200_0x02)jT808_0x0200.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
 ```
 
 ### 举个栗子2
@@ -180,7 +181,7 @@ JT808Package jT808Package = Enums.JT808MsgId.位置信息汇报.Create("12345678
         Speed = 60,
         Direction = 0,
         StatusFlag = 2,
-        JT808LocationAttachData = new Dictionary<byte, JT808LocationAttachBase>
+        BasicLocationAttachData = new Dictionary<byte, JT808LocationAttachBase>
         {
             { JT808Constants.JT808_0x0200_0x01,new JT808_0x0200_0x01{Mileage = 100}},
             { JT808Constants.JT808_0x0200_0x02,new JT808_0x0200_0x02{Oil = 125}}
@@ -244,7 +245,9 @@ JT808Serializer DT2JT808Serializer = new JT808Serializer(DT2JT808Config);
 
 1. 第一包数据上来采用平常的方式去解析数据；
 
-2. 当N包数据上来，采用统一分包消息体去接收数据，最后在合并成一条。
+2. 当第二包上来跟第一包的分包数据体(SubDataBodies)进行合并
+
+3. 当N包数据上来，延续步骤2的方式。
 
 > 普及知识点：一般行业分包是按256的整数倍，太多不行，太少也不行，必须刚刚好。
 
@@ -288,70 +291,129 @@ JT808Serializer DT2JT808Serializer = new JT808Serializer(DT2JT808Config);
 
 [可以参考Simples的Demo9](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo9.cs)
 
+### 举个栗子10
+
+场景1:
+有些设备，不会按照国标的附加信息Id来搞，把附加信息Id搞为两个字节，这样在上报上来的数据就会存在重复的附加Id，导致平台解析出错。
+
+场景2：
+由于粤标的设备厂家自定义的附加信息长度可以为四4个字节的，所以需要兼容。
+
+场景3：
+有些设备上报会出现两个相同的附加信息Id,那么只能解析一个，另一个只能丢在异常附加信息里面去处理。
+
+|附加信息类说明| 附加ID字节数 | 附加长度字节数 | 备注 |
+| :--- | :---: | :---: | :---:|
+| JT808_0x0200_CustomBodyBase  | 1 BYTE | 1 BYTE | 标准|
+| JT808_0x0200_CustomBodyBase2 | 2 BYTE | 1 BYTE | 自定义|
+| JT808_0x0200_CustomBodyBase3 | 2 BYTE | 2 BYTE | 自定义|
+| JT808_0x0200_CustomBodyBase4 | 1 BYTE | 4 BYTE | 自定义|
+
+[可以参考Simples的Demo10](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo10.cs)
+
+>注意：默认都是以**标准**的去解析，要是出现未知的附加，不一定解析就是正确，最好还是需要依照协议文档去开发然后自行注册解析器去解析。
+
+### 举个栗子11
+
+场景:
+有些设备，补报的定位数据有异常数据包内容长度跟原始的内容长度不一致导致整包的数据的解析出错，再设备不升级，改不了的情况下，尽量能解析多少补报的数据量，就解析多少。
+
+[可以参考Simples的Demo11](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo11.cs)
+
+### 举个栗子12
+
+场景:
+由于粤标的设备把2019版本的0x8105终端控制消息命令参数做了扩展，所以需要兼容。
+
+[可以参考Simples的Demo12](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo12.cs)
+
+### 举个栗子13
+
+场景:
+由于协议库本身可能存在消息解析出错的情况，要么就提PR上来，但是不一定会及时发布，这时候就需要自己把原有的消息解析复制出来，改造好，然后重新注册。
+
+[可以参考Simples的Demo13](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo13.cs)
+
+### 举个栗子14
+
+场景:
+由于某些厂商不按要求去做，明明使用的2013的协议但是在消息头部的版本标识位置为1，导致程序认为是2019协议。从而解析报错。此时可以强制解析成2013后，然后修正版本标识，重新序列化消息，以供下游服务使用
+
+[可以参考Simples的Demo14](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo14.cs)
+
+### 举个栗子15
+
+场景:
+兼容2011协议的注册消息
+
+[可以参考Simples的Demo15](https://github.com/SmallChi/JT808/blob/master/src/JT808.Protocol.Test/Simples/Demo15.cs)
+
 ## NuGet安装
 
-| Package Name          | Version                                            | Downloads                                           |
-| --------------------- | -------------------------------------------------- | --------------------------------------------------- |
-| Install-Package JT808 | ![JT808](https://img.shields.io/nuget/v/JT808.svg) | ![JT808](https://img.shields.io/nuget/dt/JT808.svg) |
-| Install-Package JT808.Protocol.Extensions.JT1078 | ![JT808.Protocol.Extensions.JT1078](https://img.shields.io/nuget/v/JT808.Protocol.Extensions.JT1078.svg) | ![JT808](https://img.shields.io/nuget/dt/JT808.Protocol.Extensions.JT1078.svg) |
-| Install-Package JT808.Protocol.Extensions.JTActiveSafety| ![JT808.Protocol.Extensions.JTActiveSafety](https://img.shields.io/nuget/v/JT808.Protocol.Extensions.JTActiveSafety.svg) | ![JT808](https://img.shields.io/nuget/dt/JT808.Protocol.Extensions.JTActiveSafety.svg) |
+| Package Name| Version| Preview  Version |Downloads|Remark|
+| --- | --- | --- | ---| --- |
+| Install-Package JT808 | ![JT808](https://img.shields.io/nuget/v/JT808.svg) | ![JT808](https://img.shields.io/nuget/vpre/JT808.svg)|![JT808](https://img.shields.io/nuget/dt/JT808.svg) |JT808|
+| Install-Package JT808.Protocol.Extensions.JT1078 | ![JT808.Protocol.Extensions.JT1078](https://img.shields.io/nuget/v/JT808.Protocol.Extensions.JT1078.svg) | ![JT808.Protocol.Extensions.JT1078](https://img.shields.io/nuget/vpre/JT808.Protocol.Extensions.JT1078.svg)|![JT808](https://img.shields.io/nuget/dt/JT808.Protocol.Extensions.JT1078.svg) |JT1078扩展JT808|
+| Install-Package JT808.Protocol.Extensions.SuBiao| ![JT808.Protocol.Extensions.SuBiao](https://img.shields.io/nuget/v/JT808.Protocol.Extensions.SuBiao.svg) | ![JT808.Protocol.Extensions.SuBiao](https://img.shields.io/nuget/vpre/JT808.Protocol.Extensions.SuBiao.svg)|![JT808](https://img.shields.io/nuget/dt/JT808.Protocol.Extensions.SuBiao.svg) |主动安全（苏标）扩展JT808|
+| Install-Package JT808.Protocol.Extensions.YueBiao| ![JT808.Protocol.Extensions.YueBiao](https://img.shields.io/nuget/v/JT808.Protocol.Extensions.YueBiao.svg) | ![JT808.Protocol.Extensions.YueBiao](https://img.shields.io/nuget/vpre/JT808.Protocol.Extensions.YueBiao.svg)|![JT808](https://img.shields.io/nuget/dt/JT808.Protocol.Extensions.YueBiao.svg) |主动安全（粤标）扩展JT808|
 
 ## 使用BenchmarkDotNet性能测试报告（只是玩玩，不能当真）
 
 ``` ini
 
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.18363.720 (1909/November2018Update/19H2)
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19041.572 (2004/?/20H1)
 Intel Core i7-8700K CPU 3.70GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
-.NET Core SDK=3.1.201
-  [Host]     : .NET Core 3.1.3 (CoreCLR 4.700.20.11803, CoreFX 4.700.20.12001), X64 RyuJIT
-  Job-UTHEME : .NET Core 3.1.3 (CoreCLR 4.700.20.11803, CoreFX 4.700.20.12001), X64 RyuJIT
+.NET Core SDK=5.0.100
+  [Host]     : .NET Core 5.0.0 (CoreCLR 5.0.20.51904, CoreFX 5.0.20.51904), X64 RyuJIT
+  Job-WADLYX : .NET Core 5.0.0 (CoreCLR 5.0.20.51904, CoreFX 5.0.20.51904), X64 RyuJIT
 
-Platform=AnyCpu  Server=False  Toolchain=.NET Core 3.1  
+Platform=AnyCpu  Server=False  Toolchain=.NET Core 5.0  
 
 ```
-|                          Method |       Categories |      N |          Mean |         Error |        StdDev |      Gen 0 | Gen 1 | Gen 2 |    Allocated |
-|-------------------------------- |----------------- |------- |--------------:|--------------:|--------------:|-----------:|------:|------:|-------------:|
-|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** |    **100** |     **276.93 μs** |      **5.466 μs** |      **4.267 μs** |    **31.7383** |     **-** |     **-** |     **196.1 KB** |
-| 0x0200_All_AttachId_Deserialize | 0x0200Serializer |    100 |     847.02 μs |     15.103 μs |     19.638 μs |    80.0781 |     - |     - |    493.75 KB |
-|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** |  **10000** |  **26,822.30 μs** |    **533.175 μs** |    **498.732 μs** |  **3187.5000** |     **-** |     **-** |  **19609.38 KB** |
-| 0x0200_All_AttachId_Deserialize | 0x0200Serializer |  10000 |  80,438.68 μs |    481.434 μs |    402.019 μs |  8000.0000 |     - |     - |  49375.07 KB |
-|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** | **100000** | **270,004.58 μs** |  **5,383.226 μs** |  **5,759.991 μs** | **32000.0000** |     **-** |     **-** | **196109.12 KB** |
-| 0x0200_All_AttachId_Deserialize | 0x0200Serializer | 100000 | 818,208.39 μs | 16,175.047 μs | 15,130.149 μs | 80000.0000 |     - |     - |    493750 KB |
-|                                 |                  |        |               |               |               |            |       |       |              |
-|                 **0x0100Serialize** | **0x0100Serializer** |    **100** |      **88.52 μs** |      **1.249 μs** |      **1.168 μs** |    **10.7422** |     **-** |     **-** |     **66.41 KB** |
-|               0x0100Deserialize | 0x0100Serializer |    100 |      79.61 μs |      1.585 μs |      2.323 μs |    15.7471 |     - |     - |     96.88 KB |
-|                 **0x0100Serialize** | **0x0100Serializer** |  **10000** |   **8,377.71 μs** |    **164.422 μs** |    **153.800 μs** |  **1078.1250** |     **-** |     **-** |   **6640.63 KB** |
-|               0x0100Deserialize | 0x0100Serializer |  10000 |   7,742.70 μs |    119.517 μs |    105.948 μs |  1578.1250 |     - |     - |    9687.5 KB |
-|                 **0x0100Serialize** | **0x0100Serializer** | **100000** |  **87,072.13 μs** |  **1,185.540 μs** |  **1,050.950 μs** | **10833.3333** |     **-** |     **-** |  **66406.45 KB** |
-|               0x0100Deserialize | 0x0100Serializer | 100000 |  77,037.85 μs |  1,515.381 μs |  1,417.488 μs | 15714.2857 |     - |     - |  96875.07 KB |
+|                          Method |       Categories |      N |          Mean |         Error |       StdDev |      Gen 0 | Gen 1 | Gen 2 |    Allocated |
+|-------------------------------- |----------------- |------- |--------------:|--------------:|-------------:|-----------:|------:|------:|-------------:|
+|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** |    **100** |     **249.02 μs** |      **3.466 μs** |     **2.894 μs** |    **31.7383** |     **-** |     **-** |    **196.88 KB** |
+| 0x0200_All_AttachId_Deserialize | 0x0200Serializer |    100 |     762.07 μs |     14.713 μs |    15.743 μs |    80.0781 |     - |     - |    496.09 KB |
+|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** |  **10000** |  **24,541.76 μs** |    **173.184 μs** |   **161.996 μs** |  **3187.5000** |     **-** |     **-** |   **19687.5 KB** |
+| 0x0200_All_AttachId_Deserialize | 0x0200Serializer |  10000 |  75,919.55 μs |  1,326.444 μs | 1,175.858 μs |  8000.0000 |     - |     - |  49609.55 KB |
+|   **0x0200_All_AttachId_Serialize** | **0x0200Serializer** | **100000** | **249,887.82 μs** |  **4,966.928 μs** | **5,520.727 μs** | **32000.0000** |     **-** |     **-** | **196876.26 KB** |
+| 0x0200_All_AttachId_Deserialize | 0x0200Serializer | 100000 | 734,062.09 μs | 10,270.434 μs | 9,104.472 μs | 80000.0000 |     - |     - |    496095 KB |
+|                                 |                  |        |               |               |              |            |       |       |              |
+|                 **0x0100Serialize** | **0x0100Serializer** |    **100** |      **79.16 μs** |      **0.906 μs** |     **0.803 μs** |    **10.7422** |     **-** |     **-** |     **66.41 KB** |
+|               0x0100Deserialize | 0x0100Serializer |    100 |      70.47 μs |      1.377 μs |     2.060 μs |    15.7471 |     - |     - |     96.88 KB |
+|                 **0x0100Serialize** | **0x0100Serializer** |  **10000** |   **7,934.91 μs** |    **121.485 μs** |   **113.637 μs** |  **1078.1250** |     **-** |     **-** |   **6640.63 KB** |
+|               0x0100Deserialize | 0x0100Serializer |  10000 |   7,077.60 μs |    139.419 μs |   165.969 μs |  1578.1250 |     - |     - |    9687.5 KB |
+|                 **0x0100Serialize** | **0x0100Serializer** | **100000** |  **80,403.44 μs** |  **1,522.446 μs** | **1,563.440 μs** | **10714.2857** |     **-** |     **-** |  **66406.25 KB** |
+|               0x0100Deserialize | 0x0100Serializer | 100000 |  69,196.07 μs |  1,289.555 μs | 1,206.251 μs | 15666.6667 |     - |     - |  96875.13 KB |
+
 
 ## JT808终端通讯协议消息对照表
 
-| 序号  | 消息ID        | 完成情况 | 测试情况 | 消息体名称                     |2019版本|
-| :---: | :-----------: | :------: | :------: | :----------------------------: |:----------------------------:|
+| 序号  | 消息ID        | 完成情况 | 测试情况 | 消息体名称                     |2019版本            | 2011版本
+| :---: | :-----------: | :------: | :------: | :---------------------------- |:----------------------------:|:----------------------------:|
 | 1     | 0x0001        | √        | √        | 终端通用应答                   |
 | 2     | 0x8001        | √        | √        | 平台通用应答                   |
 | 3     | 0x0002        | √        | √        | 终端心跳                       |
-| 4     | 0x8003        | √        | √        | 补传分包请求                   |
-| 5     | 0x0100        | √        | √        | 终端注册                       |修改|
+| 4     | 0x8003        | √        | √        | 补传分包请求                   |                 |被新增|
+| 5     | 0x0100        | √        | √        | 终端注册                       |修改             |被修改
 | 6     | 0x8100        | √        | √        | 终端注册应答                   |
 | 7     | 0x0003        | √        | √        | 终端注销                       |
 | 8     | 0x0102        | √        | √        | 终端鉴权                       |修改|
-| 9     | 0x8103        | √        | √        | 设置终端参数                   |修改且增加|
+| 9     | 0x8103        | √        | √        | 设置终端参数                   |修改且增加        |被修改
 | 10    | 0x8104        | √        | √        | 查询终端参数                   |
 | 11    | 0x0104        | √        | √        | 查询终端参数应答               |
 | 12    | 0x8105        | √        | √        | 终端控制                       |
-| 13    | 0x8106        | √        | √        | 查询指定终端参数               |
-| 14    | 0x8107        | √        | 消息体为空| 查询终端属性                   |
-| 15    | 0x0107        | √        | √        | 查询终端属性应答               |
-| 16    | 0x8108        | √        | √        | 下发终端升级包                 |
-| 17    | 0x0108        | √        | √        | 终端升级结果通知               |
-| 18    | 0x0200        | √        | √        | 位置信息汇报                   |增加附加信息|
+| 13    | 0x8106        | √        | √        | 查询指定终端参数               |                  |被新增
+| 14    | 0x8107        | √        | 消息体为空| 查询终端属性                   |                  |被新增
+| 15    | 0x0107        | √        | √        | 查询终端属性应答               |                  |被新增
+| 16    | 0x8108        | √        | √        | 下发终端升级包                 |                  |被新增
+| 17    | 0x0108        | √        | √        | 终端升级结果通知               |                  |被新增
+| 18    | 0x0200        | √        | √        | 位置信息汇报                   |增加附加信息       |被修改
 | 19    | 0x8201        | √        | √        | 位置信息查询                   |
 | 20    | 0x0201        | √        | √        | 位置信息查询应答               |
 | 21    | 0x8202        | √        | √        | 临时位置跟踪控制               |
-| 22    | 0x8203        | √        | √        | 人工确认报警消息               |
-| 23    | 0x8300        | √        | √        | 文本信息下发                   |修改|
+| 22    | 0x8203        | √        | √        | 人工确认报警消息               |                  |被新增
+| 23    | 0x8300        | √        | √        | 文本信息下发                   |修改              |被修改
 | 24    | 0x8301        | √        | √        | 事件设置                       |删除|
 | 25    | 0x0301        | √        | √        | 事件报告                       |删除|
 | 26    | 0x8302        | √        | √        | 提问下发                       |删除|
@@ -363,7 +425,7 @@ Platform=AnyCpu  Server=False  Toolchain=.NET Core 3.1
 | 32    | 0x8401        | √        | √        | 设置电话本                     |
 | 33    | 0x8500        | √        | √        | 车辆控制                       |修改|
 | 34    | 0x0500        | √        | √        | 车辆控制应答                   |
-| 35    | 0x8600        | √        | √        | 设置圆形区域                   |修改|
+| 35    | 0x8600        | √        | √        | 设置圆形区域                   |修改                |被修改
 | 36    | 0x8601        | √        | √        | 删除圆形区域                   |
 | 37    | 0x8602        | √        | √        | 设置矩形区域                   |修改|
 | 38    | 0x8603        | √        | √        | 删除矩形区域                   |
@@ -371,26 +433,26 @@ Platform=AnyCpu  Server=False  Toolchain=.NET Core 3.1
 | 40    | 0x8605        | √        | √        | 删除多边形区域                 |
 | 41    | 0x8606        | √        | √        | 设置路线                       |修改|
 | 42    | 0x8607        | √        | √        | 删除路线                       |
-| 43    | 0x8700        | √        | √      | 行驶记录仪数据采集命令         |
+| 43    | 0x8700        | √        | √      | 行驶记录仪数据采集命令         |                       |被修改
 | 44    | 0x0700        | √        | √      | 行驶记录仪数据上传             |
-| 45    | 0x8701        | √        | √      | 行驶记录仪参数下传命令         |
+| 45    | 0x8701        | √        | √      | 行驶记录仪参数下传命令         |                        |被修改
 | 46    | 0x0701        | √        | √        | 电子运单上报                   |
-| 47    | 0x0702        | √        | √        | 驾驶员身份信息采集上报         |修改|
-| 48    | 0x8702        | √        | 消息体为空| 上报驾驶员身份信息请求         |
-| 49    | 0x0704        | √        | √        | 定位数据批量上传               |修改|
-| 50    | 0x0705        | √        | √        | CAN 总线数据上传               |修改|
-| 51    | 0x0800        | √        | √        | 多媒体事件信息上传             |
-| 52    | 0x0801        | √        | √        | 多媒体数据上传                 |修改|
-| 53    | 0x8800        | √        | √        | 多媒体数据上传应答             |
+| 47    | 0x0702        | √        | √        | 驾驶员身份信息采集上报         |修改                  |被修改
+| 48    | 0x8702        | √        | 消息体为空| 上报驾驶员身份信息请求         |                      |被新增
+| 49    | 0x0704        | √        | √        | 定位数据批量上传               |修改|                 |被新增
+| 50    | 0x0705        | √        | √        | CAN 总线数据上传               |修改|                 |被新增
+| 51    | 0x0800        | √        | √        | 多媒体事件信息上传             |                      |被修改
+| 52    | 0x0801        | √        | √        | 多媒体数据上传                 |修改                  |被修改
+| 53    | 0x8800        | √        | √        | 多媒体数据上传应答             |                      |被修改
 | 54    | 0x8801        | √        | √        | 摄像头立即拍摄命令             |修改|
-| 55    | 0x0805        | √        | √        | 摄像头立即拍摄命令应答         |修改|
+| 55    | 0x0805        | √        | √        | 摄像头立即拍摄命令应答         |修改|                  |被新增
 | 56    | 0x8802        | √        | √        | 存储多媒体数据检索             |
-| 57    | 0x0802        | √        | √        | 存储多媒体数据检索应答         |
+| 57    | 0x0802        | √        | √        | 存储多媒体数据检索应答         |                      |被修改
 | 58    | 0x8803        | √        | √        | 存储多媒体数据上传             |
 | 59    | 0x8804        | √        | √        | 录音开始命令                   |
-| 60    | 0x8805        | √        | √        | 单条存储多媒体数据检索上传命令 |修改|
-| 61    | 0x8900        | √        | √        | 数据下行透传                   |修改|
-| 62    | 0x0900        | √        | √        | 数据上行透传                   |修改|
+| 60    | 0x8805        | √        | √        | 单条存储多媒体数据检索上传命令 |修改|                   |被新增
+| 61    | 0x8900        | √        | √        | 数据下行透传                   |修改                  |被修改
+| 62    | 0x0900        | √        | √        | 数据上行透传                   |修改                  |被修改
 | 63    | 0x0901        | √        | √        | 数据压缩上报                   |
 | 64    | 0x8A00        | √        | √        | 平台 RSA 公钥                  |
 | 65    | 0x0A00        | √        | √        | 终端 RSA 公钥                  |
@@ -404,3 +466,115 @@ Platform=AnyCpu  Server=False  Toolchain=.NET Core 3.1
 | 73    | 0x0608 | √     | √     | 查询区域或线路数据应答  |新增|
 | 74    | 0xE000~0xEFFF | 保留     | 保留     | 厂商自定义上行消息      |新增|
 | 75    | 0xF000~0xFFFF | 保留     | 保留     | 厂商自定义下行消息  |新增|
+
+## JT1078扩展JT808议消息对照表
+
+| 序号  | 消息ID        | 完成情况 | 测试情况 | 消息体名称                                     |
+| :---: | :-----------: | :------: | :------: | :----------------------------              |
+| 1     | 0x0200_0x14        | √        | √        | 视频相关报警                            |
+| 2     | 0x0200_0x15        | √        | √        | 视频信号丢失报警状态                     |
+| 3     | 0x0200_0x16        | √        | √        | 视频信号遮挡报警状态                     |
+| 4     | 0x0200_0x17        | √        | √        | 存储器故障报警状态                       |
+| 5     | 0x0200_0x18        | √        | √        | 异常驾驶行为报警详细描述                  |
+| 6     | 0x8103_0x0075        | √        | √        | 音视频参数设置                   |
+| 7     | 0x8103_0x0076        | √        | √        | 音视频通道列表设置                       |
+| 8     | 0x8103_0x0077        | √        | √        | 单独视频通道参数设置                       |
+| 9     | 0x8103_0x0079        | √        | √        | 特殊报警录像参数设置                   |
+| 10     | 0x8103_0x007A        | √        | √        | 视频相关报警屏蔽字                       |
+| 11     | 0x8103_0x007B        | √        | √        | 图像分析报警参数设置                       |
+| 12     | 0x8103_0x007C        | √        | √        | 终端休眠模式唤醒设置                   |
+| 13     | 0x1003        | √        | √        | 终端上传音视频属性                            |
+| 14     | 0x1005        | √        | √        | 终端上传乘客流量                     |
+| 15     | 0x1205        | √        | √        | 终端上传音视频资源列表                     |
+| 16     | 0x1206        | √        | √        | 文件上传完成通知                       |
+| 17     | 0x9003        | √        | √        | 查询终端音视频属性                  |
+| 18     | 0x9101        | √        | √        | 实时音视频传输请求                   |
+| 19     | 0x9102        | √        | √        | 音视频实时传输控制                       |
+| 20     | 0x9105        | √        | √        | 实时音视频传输状态通知                       |
+| 21     | 0x9201        | √        | √        | 平台下发远程录像回放请求                   |
+| 22     | 0x9202        | √        | √        | 平台下发远程录像回放控制                       |
+| 23     | 0x9205        | √        | √        | 查询资源列表                       |
+| 24     | 0x9206        | √        | √        | 文件上传指令                   |
+| 25     | 0x9207        | √        | √        | 文件上传控制                            |
+| 26     | 0x9301        | √        | √        | 云台旋转                     |
+| 27     | 0x9302        | √        | √        | 云台调整焦距控制                     |
+| 28     | 0x9303        | √        | √        | 云台调整光圈控制                       |
+| 29     | 0x9304        | √        | √        | 云台雨刷控制                  |
+| 30     | 0x9305        | √        | √        | 红外补光控制                   |
+| 31     | 0x9306        | √        | √        | 云台变倍控制                       |
+
+## 使用方法
+
+```dotnet
+IServiceCollection serviceDescriptors1 = new ServiceCollection();
+serviceDescriptors1.AddJT808Configure()
+                   .AddJT1078Configure();
+```
+
+## 主动安全（苏标）扩展JT808协议消息对照表
+
+| 序号  | 消息ID | 完成情况 | 测试情况 | 消息体名称 |
+| :---: | :---: | :---: | :---: | :---|
+| 1 | 0x1210 | √ | √ | 报警附件信息消息 |
+| 2 | 0x1211 | √ | √ | 文件信息上传 |
+| 3 | 0x1212 | √ | √ | 文件上传完成消息 |
+| 4 | 0x9208 | √ | √ | 报警附件上传指令 |
+| 5 | 0x9212 | √ | √ | 文件上传完成消息应答 |
+| 6 | 0x0200_0x64 | √ | √ | 高级驾驶辅助系统报警信息 |
+| 7 | 0x0200_0x65 | √ | √ | 驾驶员状态监测系统报警信息 |
+| 8 | 0x0200_0x66 | √ | √ | 胎压监测系统报警信息 |
+| 9 | 0x0200_0x67 | √ | √ | 盲区监测系统报警信息 |
+| 10 | 0x8103_0xF364 | √ | √ | 高级驾驶辅助系统参数 |
+| 11 | 0x8103_0xF365 | √ | √ | 驾驶员状态监测系统参数 |
+| 12 | 0x8103_0xF366 | √ | √ | 胎压监测系统参数 |
+| 13 | 0x8103_0xF367 | √ | √ | 盲区监测系统参数 |
+| 14 | 0x0900 | √ | √ | 上传基本信息 |
+| 15 | 0x0900_0xF7 | √ | √ | 外设工作状态 |
+| 16 | 0x0900_0xF8 | √ | √ | 外设系统信息 |
+| 17 | 0x8900 | √ | √ | 查询基本信息 |
+| 18 | 0x8900_0xF7 | √ | √ | 外设工作状态 |
+| 19 | 0x8900_0xF8 | √ | √ | 外设系统信息 |
+
+## 使用方法
+
+```dotnet
+IServiceCollection serviceDescriptors1 = new ServiceCollection();
+serviceDescriptors1.AddJT808Configure()
+                   .AddSuBiaoConfigure();
+```
+
+## 主动安全（粤标）扩展JT808协议消息对照表
+
+> 注意：基于JT/T808 2019版本
+
+| 序号  | 消息ID | 完成情况 | 测试情况 | 消息体名称 |
+| :---: | :---: | :---: | :---: | :---|
+| 1 | 0x1210 | √ | √ | 报警附件信息消息 |
+| 2 | 0x1211 | √ | √ | 文件信息上传 |
+| 3 | 0x1212 | √ | √ | 文件上传完成消息 |
+| 4 | 0x9208 | √ | √ | 报警附件上传指令 |
+| 5 | 0x9212 | √ | √ | 文件上传完成消息应答 |
+| 6 | 0x1FC4 | √ | √ | 终端升级进度上报 |
+| 7 | 0x0200_0x64 | √ | √ | 高级驾驶辅助系统报警信息 |
+| 8 | 0x0200_0x65 | √ | √ | 驾驶员状态监测系统报警信息 |
+| 9 | 0x0200_0x66 | √ | √ | 胎压监测系统报警信息 |
+| 10 | 0x0200_0x67 | √ | √ | 盲区监测系统报警信息 |
+| 11 | 0x8103_0xF364 | √ | √ | 高级驾驶辅助系统参数 |
+| 12 | 0x8103_0xF365 | √ | √ | 驾驶员状态监测系统参数 |
+| 13 | 0x8103_0xF366 | √ | √ | 胎压监测系统参数 |
+| 14 | 0x8103_0xF367 | √ | √ | 盲区监测系统参数 |
+| 15 | 0x8103_0xF370 | √ | √ | 智能视频协议版本信息 |
+| 16 | 0x0900 | √ | √ | 上传基本信息 |
+| 17 | 0x0900_0xF7 | √ | √ | 外设工作状态 |
+| 18 | 0x0900_0xF8 | √ | √ | 外设系统信息 |
+| 19 | 0x8900 | √ | √ | 查询基本信息 |
+| 20 | 0x8900_0xF7 | √ | √ | 外设工作状态 |
+| 21 | 0x8900_0xF8 | √ | √ | 外设系统信息 |
+
+## 使用方法
+
+```dotnet
+IServiceCollection serviceDescriptors1 = new ServiceCollection();
+serviceDescriptors1.AddJT808Configure()
+                   .AddYueBiaoConfigure();
+```

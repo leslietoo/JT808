@@ -17,16 +17,26 @@ namespace JT808.Protocol.MessageBody.CarDVR
     /// </summary>
     public class JT808_CarDVR_Up_0x11 : JT808CarDVRUpBodies, IJT808MessagePackFormatter<JT808_CarDVR_Up_0x11>, IJT808Analyze
     {
+        /// <summary>
+        /// 0x11
+        /// </summary>
         public override byte CommandId =>  JT808CarDVRCommandID.采集指定的超时驾驶记录.ToByteValue();
         /// <summary>
         /// 请求发送指定的时间范围内 N 个单位数据块的数据（N≥1）
         /// </summary>
         public List<JT808_CarDVR_Up_0x11_DriveOverTime> JT808_CarDVR_Up_0x11_DriveOverTimes{ get; set; }
+        /// <summary>
+        /// 符合条件的超时驾驶记录
+        /// </summary>
         public override string Description => "符合条件的超时驾驶记录";
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
-            JT808_CarDVR_Up_0x11 value = new JT808_CarDVR_Up_0x11();
             writer.WriteStartArray("请求发送指定的时间范围内 N 个单位数据块的数据");
             var count = (reader.ReadCurrentRemainContentLength() - 1) / 50;//记录块个数, -1 去掉校验位
             for (int i = 0; i < count; i++)
@@ -38,10 +48,10 @@ namespace JT808.Protocol.MessageBody.CarDVR
                 jT808_CarDVR_Up_0x11_DriveOverTime.DriverLicenseNo = reader.ReadASCII(18);
                 writer.WriteString($"[{hex.ToArray().ToHexString()}机动车驾驶证号码]", jT808_CarDVR_Up_0x11_DriveOverTime.DriverLicenseNo);
                 hex = reader.ReadVirtualArray(6);
-                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingStartTime = reader.ReadDateTime6();
+                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingStartTime = reader.ReadDateTime_yyMMddHHmmss();
                 writer.WriteString($"[{hex.ToArray().ToHexString()}连续驾驶开始时间]", jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingStartTime);
                 hex = reader.ReadVirtualArray(6);
-                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingEndTime = reader.ReadDateTime6();
+                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingEndTime = reader.ReadDateTime_yyMMddHHmmss();
                 writer.WriteString($"[{hex.ToArray().ToHexString()}连续驾驶结束时间]", jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingEndTime);
                 writer.WriteStartObject("连续驾驶开始时间所在的最近一次有效位置信息");
                 jT808_CarDVR_Up_0x11_DriveOverTime.GpsStartLng = reader.ReadInt32();
@@ -64,7 +74,12 @@ namespace JT808.Protocol.MessageBody.CarDVR
             }
             writer.WriteEndArray();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_CarDVR_Up_0x11 value, IJT808Config config)
         {
             foreach (var driveOverTime in value.JT808_CarDVR_Up_0x11_DriveOverTimes)
@@ -72,8 +87,8 @@ namespace JT808.Protocol.MessageBody.CarDVR
                 var currentPosition = writer.GetCurrentPosition();
                 writer.WriteASCII(driveOverTime.DriverLicenseNo);
                 writer.Skip(18 - (writer.GetCurrentPosition() - currentPosition), out var _);
-                writer.WriteDateTime6(driveOverTime.ContinueDrivingStartTime);
-                writer.WriteDateTime6(driveOverTime.ContinueDrivingEndTime);
+                writer.WriteDateTime_yyMMddHHmmss(driveOverTime.ContinueDrivingStartTime);
+                writer.WriteDateTime_yyMMddHHmmss(driveOverTime.ContinueDrivingEndTime);
                 writer.WriteInt32(driveOverTime.GpsStartLng);
                 writer.WriteInt32(driveOverTime.GpsStartLat);
                 writer.WriteInt16(driveOverTime.StartHeight);
@@ -82,7 +97,12 @@ namespace JT808.Protocol.MessageBody.CarDVR
                 writer.WriteInt16(driveOverTime.EndHeight);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_CarDVR_Up_0x11 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_CarDVR_Up_0x11 value = new JT808_CarDVR_Up_0x11();
@@ -92,8 +112,8 @@ namespace JT808.Protocol.MessageBody.CarDVR
             {
                 JT808_CarDVR_Up_0x11_DriveOverTime jT808_CarDVR_Up_0x11_DriveOverTime = new JT808_CarDVR_Up_0x11_DriveOverTime();
                 jT808_CarDVR_Up_0x11_DriveOverTime.DriverLicenseNo = reader.ReadASCII(18);
-                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingStartTime = reader.ReadDateTime6();
-                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingEndTime = reader.ReadDateTime6();
+                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingStartTime = reader.ReadDateTime_yyMMddHHmmss();
+                jT808_CarDVR_Up_0x11_DriveOverTime.ContinueDrivingEndTime = reader.ReadDateTime_yyMMddHHmmss();
                 jT808_CarDVR_Up_0x11_DriveOverTime.GpsStartLng = reader.ReadInt32();
                 jT808_CarDVR_Up_0x11_DriveOverTime.GpsStartLat = reader.ReadInt32();
                 jT808_CarDVR_Up_0x11_DriveOverTime.StartHeight = reader.ReadInt16();

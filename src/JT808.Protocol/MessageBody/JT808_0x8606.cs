@@ -6,6 +6,7 @@ using JT808.Protocol.MessagePack;
 using JT808.Protocol.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -16,7 +17,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8606 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8606>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x8606
+        /// </summary>
         public override ushort MsgId { get; } = 0x8606;
+        /// <summary>
+        /// 设置路线
+        /// </summary>
         public override string Description => "设置路线";
         /// <summary>
         /// 路线 ID
@@ -53,7 +60,12 @@ namespace JT808.Protocol.MessageBody
         /// 路线名称
         /// </summary>
         public string RouteName { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8606 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8606 jT808_0X8606 = new JT808_0x8606();
@@ -63,8 +75,8 @@ namespace JT808.Protocol.MessageBody
             bool bit0Flag = routeProperty16Bit.Slice(routeProperty16Bit.Length - 1).ToString().Equals("0");
             if (!bit0Flag)
             {
-                jT808_0X8606.StartTime = reader.ReadDateTime6();
-                jT808_0X8606.EndTime = reader.ReadDateTime6();
+                jT808_0X8606.StartTime = reader.ReadDateTime_yyMMddHHmmss();
+                jT808_0X8606.EndTime = reader.ReadDateTime_yyMMddHHmmss();
             }
             jT808_0X8606.InflectionPointCount = reader.ReadUInt16();
             jT808_0X8606.InflectionPointItems = new List<JT808InflectionPointProperty>();
@@ -101,7 +113,12 @@ namespace JT808.Protocol.MessageBody
             }
             return jT808_0X8606;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8606 value, IJT808Config config)
         {
             writer.WriteUInt32(value.RouteId);
@@ -111,10 +128,10 @@ namespace JT808.Protocol.MessageBody
             if (!bit0Flag)
             {
                 if (value.StartTime.HasValue)
-                    writer.WriteDateTime6(value.StartTime.Value);
+                    writer.WriteDateTime_yyMMddHHmmss(value.StartTime.Value);
 
                 if (value.EndTime.HasValue)
-                    writer.WriteDateTime6(value.EndTime.Value);
+                    writer.WriteDateTime_yyMMddHHmmss(value.EndTime.Value);
             }
             //bool bit1Flag = routeProperty16Bit.Slice(routeProperty16Bit.Length - 2, 1).ToString().Equals("0");
             if (value.InflectionPointItems != null && value.InflectionPointItems.Count > 0)
@@ -160,7 +177,12 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteUInt16Return((ushort)(writer.GetCurrentPosition() - RouteNameLengthPosition - 2), RouteNameLengthPosition);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8606 value = new JT808_0x8606();
@@ -168,7 +190,7 @@ namespace JT808.Protocol.MessageBody
             writer.WriteNumber($"[{ value.RouteId.ReadNumber()}]路线ID", value.RouteId);
             value.RouteProperty = reader.ReadUInt16();
             writer.WriteNumber($"[{ value.RouteProperty.ReadNumber()}]路线属性", value.RouteProperty);
-            ReadOnlySpan<char> routeProperty16Bit = Convert.ToString(value.RouteProperty, 2).PadLeft(16, '0').AsSpan();
+            ReadOnlySpan<char> routeProperty16Bit =string.Join("", Convert.ToString(value.RouteProperty, 2).PadLeft(16, '0').Reverse()).AsSpan();
             writer.WriteStartObject($"路线属性对象[{routeProperty16Bit.ToString()}]");
             if (reader.Version == JT808Version.JTT2019)
             {
@@ -191,12 +213,12 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteString($"[bit0]{routeProperty16Bit[0]}", routeProperty16Bit[0] == '1' ? "根据时间" : "无");
             }
             writer.WriteEndObject();
-            bool bit0Flag = routeProperty16Bit.Slice(routeProperty16Bit.Length - 1).ToString().Equals("0");
+            bool bit0Flag = routeProperty16Bit.Slice(0,1).ToString().Equals("0");
             if (!bit0Flag)
             {
-                value.StartTime = reader.ReadDateTime6();
+                value.StartTime = reader.ReadDateTime_yyMMddHHmmss();
                 writer.WriteString($"[{ value.StartTime.Value.ToString("yyMMddHHmmss")}]起始时间", value.StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-                value.EndTime = reader.ReadDateTime6();
+                value.EndTime = reader.ReadDateTime_yyMMddHHmmss();
                 writer.WriteString($"[{ value.EndTime.Value.ToString("yyMMddHHmmss")}]结束时间", value.EndTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             value.InflectionPointCount = reader.ReadUInt16();
@@ -218,7 +240,7 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteNumber($"[{ jT808InflectionPointProperty.SectionWidth.ReadNumber()}]路段宽度", jT808InflectionPointProperty.SectionWidth);
                 jT808InflectionPointProperty.SectionProperty = reader.ReadByte();
                 writer.WriteNumber($"[{ jT808InflectionPointProperty.SectionProperty.ReadNumber()}]路段属性", jT808InflectionPointProperty.SectionProperty);
-                ReadOnlySpan<char> sectionProperty8Bit = Convert.ToString(jT808InflectionPointProperty.SectionProperty, 2).PadLeft(8, '0').AsSpan();
+                ReadOnlySpan<char> sectionProperty8Bit =string.Join("", Convert.ToString(jT808InflectionPointProperty.SectionProperty, 2).PadLeft(8, '0').Reverse()).AsSpan();
                 writer.WriteStartObject($"路段属性对象[{sectionProperty8Bit.ToString()}]");
                 writer.WriteString($"[bit4~bit7]保留", sectionProperty8Bit.Slice(4, 4).ToString());
                 writer.WriteString($"[bit3]进路线是否报警给平台-{sectionProperty8Bit[3]}", sectionProperty8Bit[3] == '0' ? "无" : "限速");
@@ -226,7 +248,7 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteString($"[bit1]{sectionProperty8Bit[1]}", sectionProperty8Bit[1] == '0' ? "东经" : "西经");
                 writer.WriteString($"[bit0]{sectionProperty8Bit[0]}", sectionProperty8Bit[0] == '0' ? "无" : "行驶时间");
                 writer.WriteEndObject();
-                bool sectionBit0Flag = sectionProperty8Bit.Slice(sectionProperty8Bit.Length - 1).ToString().Equals("0");
+                bool sectionBit0Flag = sectionProperty8Bit.Slice(0,1).ToString().Equals("0");
                 if (!sectionBit0Flag)
                 {
                     jT808InflectionPointProperty.SectionLongDrivingThreshold = reader.ReadUInt16();
@@ -234,7 +256,7 @@ namespace JT808.Protocol.MessageBody
                     jT808InflectionPointProperty.SectionDrivingUnderThreshold = reader.ReadUInt16();
                     writer.WriteNumber($"[{ jT808InflectionPointProperty.SectionDrivingUnderThreshold.Value.ReadNumber()}]路段行驶不足阈值", jT808InflectionPointProperty.SectionDrivingUnderThreshold.Value);
                 }
-                bool sectionBit1Flag = sectionProperty8Bit.Slice(sectionProperty8Bit.Length - 2, 1).ToString().Equals("0");
+                bool sectionBit1Flag = sectionProperty8Bit.Slice(1, 1).ToString().Equals("0");
                 if (!sectionBit1Flag)
                 {
                     jT808InflectionPointProperty.SectionHighestSpeed = reader.ReadUInt16();

@@ -11,7 +11,7 @@ namespace JT808.Protocol.MessageBody
         /// 自定义附加信息Id
         /// </summary>
         public abstract byte AttachInfoId { get; set; }
-
+       
         /// <summary>
         /// 自定义附加信息长度
         /// </summary>

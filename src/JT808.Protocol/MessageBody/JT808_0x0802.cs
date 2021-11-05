@@ -15,7 +15,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x0802 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0802>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x0802
+        /// </summary>
         public override ushort MsgId { get; } = 0x0802;
+        /// <summary>
+        /// 存储多媒体数据检索应答
+        /// </summary>
         public override string Description => "存储多媒体数据检索应答";
         /// <summary>
         /// 应答流水号
@@ -31,7 +37,12 @@ namespace JT808.Protocol.MessageBody
         /// 检索项集合
         /// </summary>
         public List<JT808MultimediaSearchProperty> MultimediaSearchItems { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x0802 value = new JT808_0x0802();
@@ -44,15 +55,19 @@ namespace JT808.Protocol.MessageBody
             {
                 writer.WriteStartObject();
                 JT808MultimediaSearchProperty jT808MultimediaSearchProperty = new JT808MultimediaSearchProperty();
-                jT808MultimediaSearchProperty.MultimediaId = reader.ReadUInt32();
-                writer.WriteNumber($"[{jT808MultimediaSearchProperty.MultimediaId.ReadNumber()}]多媒体ID", jT808MultimediaSearchProperty.MultimediaId);
+                if (reader.ReadCurrentRemainContentLength() == (value.MultimediaItemCount - i) * (4 + 1 + 1 + 1 + 28))
+                {
+                    //2013 ,2019协议          
+                    jT808MultimediaSearchProperty.MultimediaId = reader.ReadUInt32();
+                    writer.WriteNumber($"[{jT808MultimediaSearchProperty.MultimediaId.ReadNumber()}]多媒体ID", jT808MultimediaSearchProperty.MultimediaId);
+                }
                 jT808MultimediaSearchProperty.MultimediaType = reader.ReadByte();
                 writer.WriteNumber($"[{jT808MultimediaSearchProperty.MultimediaType.ReadNumber()}]多媒体类型-{((JT808MultimediaType)jT808MultimediaSearchProperty.MultimediaType).ToString()}", jT808MultimediaSearchProperty.MultimediaType);
                 jT808MultimediaSearchProperty.ChannelId = reader.ReadByte();
                 writer.WriteNumber($"[{jT808MultimediaSearchProperty.ChannelId.ReadNumber()}]通道ID", jT808MultimediaSearchProperty.ChannelId);
                 jT808MultimediaSearchProperty.EventItemCoding = reader.ReadByte();
                 writer.WriteNumber($"[{jT808MultimediaSearchProperty.EventItemCoding.ReadNumber()}]事件项编码-{((JT808EventItemCoding)jT808MultimediaSearchProperty.EventItemCoding).ToString()}", jT808MultimediaSearchProperty.EventItemCoding);
-                JT808MessagePackReader positionReader = new JT808MessagePackReader(reader.ReadArray(28));
+                JT808MessagePackReader positionReader = new JT808MessagePackReader(reader.ReadArray(28), reader.Version);
                 writer.WriteStartObject($"位置基本信息");
                 config.GetAnalyze<JT808_0x0200>().Analyze(ref positionReader, writer, config);
                 writer.WriteEndObject();
@@ -60,7 +75,12 @@ namespace JT808.Protocol.MessageBody
             }
             writer.WriteEndArray();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x0802 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x0802 value = new JT808_0x0802();
@@ -70,24 +90,38 @@ namespace JT808.Protocol.MessageBody
             for (var i = 0; i < value.MultimediaItemCount; i++)
             {
                 JT808MultimediaSearchProperty jT808MultimediaSearchProperty = new JT808MultimediaSearchProperty();
-                jT808MultimediaSearchProperty.MultimediaId = reader.ReadUInt32();
+                if (reader.ReadCurrentRemainContentLength() ==(value.MultimediaItemCount-i)*(4 + 1 + 1 + 1 + 28))
+                {
+                    //2013 ,2019协议                   
+                    jT808MultimediaSearchProperty.MultimediaId = reader.ReadUInt32();
+
+                }
                 jT808MultimediaSearchProperty.MultimediaType = reader.ReadByte();
                 jT808MultimediaSearchProperty.ChannelId = reader.ReadByte();
                 jT808MultimediaSearchProperty.EventItemCoding = reader.ReadByte();
-                JT808MessagePackReader positionReader = new JT808MessagePackReader(reader.ReadArray(28));
+                JT808MessagePackReader positionReader = new JT808MessagePackReader(reader.ReadArray(28), reader.Version);
                 jT808MultimediaSearchProperty.Position = config.GetMessagePackFormatter<JT808_0x0200>().Deserialize(ref positionReader, config);
                 value.MultimediaSearchItems.Add(jT808MultimediaSearchProperty);
             }
             return value;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x0802 value, IJT808Config config)
         {
             writer.WriteUInt16(value.MsgNum);
             writer.WriteUInt16((ushort)value.MultimediaSearchItems.Count);
             foreach (var item in value.MultimediaSearchItems)
             {
-                writer.WriteUInt32(item.MultimediaId);
+                if (writer.Version != JT808Version.JTT2011)
+                {
+                    writer.WriteUInt32(item.MultimediaId);
+
+                }
                 writer.WriteByte(item.MultimediaType);
                 writer.WriteByte(item.ChannelId);
                 writer.WriteByte(item.EventItemCoding);

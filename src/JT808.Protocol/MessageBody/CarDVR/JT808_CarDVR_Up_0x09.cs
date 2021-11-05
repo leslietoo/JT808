@@ -18,16 +18,26 @@ namespace JT808.Protocol.MessageBody.CarDVR
     /// </summary>
     public class JT808_CarDVR_Up_0x09 : JT808CarDVRUpBodies, IJT808MessagePackFormatter<JT808_CarDVR_Up_0x09>, IJT808Analyze
     {
+        /// <summary>
+        /// 0x09
+        /// </summary>
         public override byte CommandId => JT808CarDVRCommandID.采集指定的位置信息记录.ToByteValue();
         /// <summary>
         /// 请求发送指定的时间范围内 N 个单位数据块的数据（N≥1）
         /// </summary>
         public List<JT808_CarDVR_Up_0x09_PositionPerHour> JT808_CarDVR_Up_0x09_PositionPerHours { get; set; }
+        /// <summary>
+        /// 符合条件的位置信息记录
+        /// </summary>
         public override string Description => "符合条件的位置信息记录";
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
-            JT808_CarDVR_Up_0x09 value = new JT808_CarDVR_Up_0x09();
             writer.WriteStartArray("请求发送指定的时间范围内 N 个单位数据块的数据");
             var count = (reader.ReadCurrentRemainContentLength() - 1) / 666;//记录块个数, -1 去掉校验位
             for (int i = 0; i < count; i++)
@@ -36,7 +46,7 @@ namespace JT808.Protocol.MessageBody.CarDVR
                 writer.WriteStartObject();
                 writer.WriteStartObject($"指定的结束时间之前最近的第{i+1}小时的位置信息记录");
                 var hex = reader.ReadVirtualArray(6);
-                jT808_CarDVR_Up_0x09_PositionPerHour.StartTime = reader.ReadDateTime6();
+                jT808_CarDVR_Up_0x09_PositionPerHour.StartTime = reader.ReadDateTime_yyMMddHHmmss();
                 writer.WriteString($"[{hex.ToArray().ToHexString()}]开始时间", jT808_CarDVR_Up_0x09_PositionPerHour.StartTime);
                 for (int j = 0; j < 60; j++)//60钟
                 {
@@ -57,11 +67,17 @@ namespace JT808.Protocol.MessageBody.CarDVR
             }
             writer.WriteEndArray();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_CarDVR_Up_0x09 value, IJT808Config config)
         {
             foreach (var positionPerHour in value.JT808_CarDVR_Up_0x09_PositionPerHours)
             {
-                writer.WriteDateTime6(positionPerHour.StartTime);
+                writer.WriteDateTime_yyMMddHHmmss(positionPerHour.StartTime);
                 for (int i = 0; i < 60; i++)
                 {
                     if (i < positionPerHour.JT808_CarDVR_Up_0x09_PositionPerMinutes.Count)
@@ -80,7 +96,12 @@ namespace JT808.Protocol.MessageBody.CarDVR
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_CarDVR_Up_0x09 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_CarDVR_Up_0x09 value = new JT808_CarDVR_Up_0x09();
@@ -90,7 +111,7 @@ namespace JT808.Protocol.MessageBody.CarDVR
             {
                 JT808_CarDVR_Up_0x09_PositionPerHour jT808_CarDVR_Up_0x09_PositionPerHour = new JT808_CarDVR_Up_0x09_PositionPerHour()
                 {
-                    StartTime = reader.ReadDateTime6(),
+                    StartTime = reader.ReadDateTime_yyMMddHHmmss(),
                     JT808_CarDVR_Up_0x09_PositionPerMinutes = new List<JT808_CarDVR_Up_0x09_PositionPerMinute>()
                 };
                 for (int j = 0; j < 60; j++)//60钟

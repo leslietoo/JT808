@@ -58,9 +58,9 @@ namespace JT808.Protocol.Test.MessagePack
             byte[] array = new byte[4096];
             var msgpackWriter = new JT808MessagePackWriter(array);
             msgpackWriter.WriteStart();
-            msgpackWriter.WriteDateTime4(DateTime.Parse("2019-06-19 23:23:23"));
-            msgpackWriter.WriteDateTime5(DateTime.Parse("2019-06-19 23:23:23.123"));
-            msgpackWriter.WriteDateTime6(DateTime.Parse("2019-06-19 23:23:23"));
+            msgpackWriter.WriteDateTime_YYYYMMDD(DateTime.Parse("2019-06-19 23:23:23"));
+            msgpackWriter.WriteDateTime_HHmmssfff(DateTime.Parse("2019-06-19 23:23:23.123"));
+            msgpackWriter.WriteDateTime_yyMMddHHmmss(DateTime.Parse("2019-06-19 23:23:23"));
             msgpackWriter.WriteEnd();
             msgpackWriter.WriteEncode();
             //===========output=========
@@ -75,6 +75,25 @@ namespace JT808.Protocol.Test.MessagePack
             Assert.Equal("7E2019061923232301231906192323237E".Replace(" ", ""), encodeBytes);
             var realBytes = msgpackWriter.FlushAndGetRealArray().ToHexString();
             Assert.Equal("7E2019061923232301231906192323237E7E2019061923232301231906192323237E", realBytes);
+        }
+
+        [Fact]
+        public void WriteDateTimeNullTest()
+        {
+            byte[] array = new byte[4096];
+            var msgpackWriter = new JT808MessagePackWriter(array);
+            msgpackWriter.WriteStart();
+            msgpackWriter.WriteDateTime_YYYYMMDD(null);
+            msgpackWriter.WriteDateTime_HHmmssfff(null);
+            msgpackWriter.WriteDateTime_yyMMddHHmmss(null);
+            msgpackWriter.WriteEnd();
+            msgpackWriter.WriteEncode();
+            //===========output=========
+            //WriteDateTime4=>YYYYMMDD=>00 00 00 00
+            //WriteDateTime5=>HH-mm-ss-fff|HH-mm-ss-msms=>00 00 00 00 00
+            //WriteDateTime6=>yyMMddHHmmss=>00 00 00 00
+            var encodeBytes = msgpackWriter.FlushAndGetEncodingArray().ToHexString();
+            Assert.Equal("7E0000000000000000000000000000007E".Replace(" ", ""), encodeBytes);
         }
 
         [Fact]
@@ -489,6 +508,47 @@ namespace JT808.Protocol.Test.MessagePack
             msgpackWriter.WriteStringEndChar0("smallchi(koike)");
             var hex = msgpackWriter.FlushAndGetEncodingArray().ToHexString();
             Assert.Equal("736D616C6C636869286B6F696B652900", hex);
+        }
+
+        [Fact]
+        public void IntToBcdTest()
+        {
+            var bytes1 = new byte[5];
+            Span<byte> buffer1 = new Span<byte>(bytes1);
+            IntToBcd(123456700, buffer1, buffer1.Length);
+            Assert.NotEqual(new byte[] { 0x12, 0x34, 0x56, 0x70,0x00 }, buffer1.ToArray());
+            Assert.Equal(new byte[] { 0x01, 0x23, 0x45, 0x67,0x00 }, buffer1.ToArray());
+
+            var bytes = new byte[6];
+            Span<byte> buffer = new Span<byte>(bytes);
+            IntToBcd(123456700, buffer, buffer.Length);
+            Assert.Equal(new byte[] { 0x00, 0x01, 0x23, 0x45, 0x67, 0x00 }, buffer.ToArray());
+        }
+
+        [Fact]
+        public void WriteBcdTest()
+        {
+            byte[] array = new byte[100];
+            var msgpackWriter = new JT808MessagePackWriter(array);
+            int val1 = 1234567890;
+            long val2 = 123456789011;
+            msgpackWriter.WriteBCD(val1, 5);
+            msgpackWriter.WriteBCD(val2, 10);
+            var result = msgpackWriter.FlushAndGetRealArray();
+            Assert.Equal(new byte[] { 0x12, 0x34, 0x56, 0x78, 0x90, 0x00, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11 }, result);
+        }
+
+        private void IntToBcd(int num, Span<byte> list, int count)
+        {
+            int level = count - 1;
+            var high = num / 100;
+            var low = num % 100;
+            if (high > 0)
+            {
+                IntToBcd(high, list, --count);
+            }
+            byte res = (byte)(((low / 10) << 4) + (low % 10));
+            list[level] = res;
         }
     }
 }

@@ -5,11 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using static JT808.Protocol.MessageBody.JT808_0x8105;
 
 namespace JT808.Protocol
 {
+    /// <summary>
+    /// JT808接口配置
+    /// </summary>
     public interface IJT808Config
     {
+        /// <summary>
+        /// 配置ID
+        /// </summary>
         string ConfigId { get; }
         /// <summary>
         /// 消息流水号
@@ -61,6 +68,10 @@ namespace JT808.Protocol
         /// </summary>
         IJT808_0x8500_2019_Factory JT808_0x8500_2019_Factory { get; set; }
         /// <summary>
+        /// 终端控制自定义参数命令工厂
+        /// </summary>
+        IJT808_0x8105_Cusotm_Factory JT808_0x8105_Cusotm_Factory { get; set; }
+        /// <summary>
         /// 记录仪上行命令字工厂
         /// </summary>
         IJT808_CarDVR_Up_Factory JT808_CarDVR_Up_Factory { get; set; }
@@ -100,5 +111,12 @@ namespace JT808.Protocol
         /// <param name="externalAssemblies"></param>
         /// <returns></returns>
         IJT808Config Register(params Assembly[] externalAssemblies);
+        /// <summary>
+        /// 替换原有消息
+        /// </summary>
+        void ReplaceMsgId<TSourceJT808Bodies, TTargetJT808Bodies>()
+            where TSourceJT808Bodies : JT808Bodies
+            where TTargetJT808Bodies : JT808Bodies,new();
+
     }
 }

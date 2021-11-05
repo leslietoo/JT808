@@ -6,6 +6,7 @@ using JT808.Protocol.MessagePack;
 using JT808.Protocol.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -17,7 +18,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8600 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8600>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x8600
+        /// </summary>
         public override ushort MsgId { get; } = 0x8600;
+        /// <summary>
+        /// 设置圆形区域
+        /// </summary>
         public override string Description => "设置圆形区域";
         /// <summary>
         /// 设置属性
@@ -32,7 +39,12 @@ namespace JT808.Protocol.MessageBody
         /// 区域项
         /// </summary>
         public List<JT808CircleAreaProperty> AreaItems { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8600 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8600 jT808_0X8600 = new JT808_0x8600();
@@ -51,8 +63,8 @@ namespace JT808.Protocol.MessageBody
                 bool bit0Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 1).ToString().Equals("0");
                 if (!bit0Flag)
                 {
-                    jT808CircleAreaProperty.StartTime = reader.ReadDateTime6();
-                    jT808CircleAreaProperty.EndTime = reader.ReadDateTime6();
+                    jT808CircleAreaProperty.StartTime = reader.ReadDateTime_yyMMddHHmmss();
+                    jT808CircleAreaProperty.EndTime = reader.ReadDateTime_yyMMddHHmmss();
                 }
                 bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");
                 if (!bit1Flag)
@@ -73,7 +85,12 @@ namespace JT808.Protocol.MessageBody
             }
             return jT808_0X8600;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8600 value, IJT808Config config)
         {
             writer.WriteByte(value.SettingAreaProperty);
@@ -93,11 +110,11 @@ namespace JT808.Protocol.MessageBody
                     {
                         if (item.StartTime.HasValue)
                         {
-                            writer.WriteDateTime6(item.StartTime.Value);
+                            writer.WriteDateTime_yyMMddHHmmss(item.StartTime.Value);
                         }
                         if (item.EndTime.HasValue)
                         {
-                            writer.WriteDateTime6(item.EndTime.Value);
+                            writer.WriteDateTime_yyMMddHHmmss(item.EndTime.Value);
                         }
                     }
                     bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");
@@ -125,7 +142,12 @@ namespace JT808.Protocol.MessageBody
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8600 value = new JT808_0x8600();
@@ -143,7 +165,7 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteNumber($"[{ jT808CircleAreaProperty.AreaId.ReadNumber()}]区域ID", jT808CircleAreaProperty.AreaId);
                 jT808CircleAreaProperty.AreaProperty = reader.ReadUInt16();
                 writer.WriteNumber($"[{ jT808CircleAreaProperty.AreaProperty.ReadNumber()}]区域属性", jT808CircleAreaProperty.AreaProperty);
-                ReadOnlySpan<char> areaPropertyBits = Convert.ToString(jT808CircleAreaProperty.AreaProperty, 2).PadLeft(16, '0').AsSpan();
+                ReadOnlySpan<char> areaPropertyBits =string.Join("", Convert.ToString(jT808CircleAreaProperty.AreaProperty, 2).PadLeft(16, '0').Reverse()).AsSpan();
                 writer.WriteStartObject($"区域属性对象[{areaPropertyBits.ToString()}]");
                 if (reader.Version == JT808Version.JTT2019)
                 {
@@ -186,9 +208,9 @@ namespace JT808.Protocol.MessageBody
                 bool bit0Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 1).ToString().Equals("0");
                 if (!bit0Flag)
                 {
-                    jT808CircleAreaProperty.StartTime = reader.ReadDateTime6();
+                    jT808CircleAreaProperty.StartTime = reader.ReadDateTime_yyMMddHHmmss();
                     writer.WriteString($"[{ jT808CircleAreaProperty.StartTime.Value.ToString("yyMMddHHmmss")}]起始时间", jT808CircleAreaProperty.StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-                    jT808CircleAreaProperty.EndTime = reader.ReadDateTime6();
+                    jT808CircleAreaProperty.EndTime = reader.ReadDateTime_yyMMddHHmmss();
                     writer.WriteString($"[{ jT808CircleAreaProperty.EndTime.Value.ToString("yyMMddHHmmss")}]结束时间", jT808CircleAreaProperty.EndTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");

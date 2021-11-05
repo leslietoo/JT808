@@ -18,13 +18,18 @@ namespace JT808.Protocol.Test.MessageBody
     public class JT808_0x0200Test
     {
         JT808Serializer JT808Serializer;
+        JT808Serializer JT808Serializer1;
 
         public JT808_0x0200Test()
         {
             IJT808Config jT808Config = new DefaultGlobalConfig();
-            jT808Config.JT808_0X0200_Custom_Factory.SetMap<JT808LocationAttachImpl0x06>();
+            IJT808Config jT808Config1 = new DefaultGlobalConfig();
+            jT808Config1.SkipCRCCode = true;
+            jT808Config.JT808_0X0200_Custom_Factory.SetMap<JT808LocationAttachImpl0x61>();
             JT808Serializer = new JT808Serializer(jT808Config);
+            JT808Serializer1 = new JT808Serializer(jT808Config1);
         }
+
         [Fact]
         public void Test1()
         {
@@ -38,13 +43,13 @@ namespace JT808.Protocol.Test.MessageBody
                 Speed = 60,
                 Direction = 0,
                 StatusFlag = 2,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
             {
                 Mileage = 100
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
             {
                 Oil = 55
             });
@@ -78,13 +83,13 @@ namespace JT808.Protocol.Test.MessageBody
                     Speed = 60,
                     Direction = 0,
                     StatusFlag = 2,
-                    JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                    BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
                 };
-                jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+                jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
                 {
                     Mileage = 100
                 });
-                jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+                jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
                 {
                     Oil = 55
                 });
@@ -134,8 +139,8 @@ namespace JT808.Protocol.Test.MessageBody
             Assert.Equal(132444444, jT808UploadLocationRequest.Lng);
             Assert.Equal(60, jT808UploadLocationRequest.Speed);
             Assert.Equal((uint)2, jT808UploadLocationRequest.StatusFlag);
-            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
-            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
+            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
+            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
         }
 
         [Fact]
@@ -176,32 +181,32 @@ namespace JT808.Protocol.Test.MessageBody
                 Speed = 60,
                 Direction = 0,
                 StatusFlag = 2,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>(),
-                JT808CustomLocationAttachData = new Dictionary<byte, JT808_0x0200_CustomBodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>(),
+                CustomLocationAttachData = new Dictionary<byte, JT808_0x0200_CustomBodyBase>()
             };
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
             {
                 Mileage = 100
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
             {
                 Oil = 55
             });
-            jT808UploadLocationRequest.JT808CustomLocationAttachData.Add(0x06, new JT808LocationAttachImpl0x06
+            jT808UploadLocationRequest.CustomLocationAttachData.Add(0x61, new JT808LocationAttachImpl0x61
             {
                 Age = 18,
                 Gender = 1,
                 UserName = "smallchi"
             });
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
-            Assert.Equal("000000010000000200BA7F0E07E4F11C0028003C000018071510101001040000006402020037060D0000001201736D616C6C636869", hex);
+            Assert.Equal("000000010000000200BA7F0E07E4F11C0028003C000018071510101001040000006402020037610D0000001201736D616C6C636869", hex);
         }
 
         [Fact]
         public void Test4()
         {
             // 1.添加自定义附加信息扩展 AddJT808LocationAttachMethod 
-            byte[] bodys = "00 00 00 01 00 00 00 02 00 BA 7F 0E 07 E4 F1 1C 00 28 00 3C 00 00 18 07 15 10 10 10 01 04 00 00 00 64 02 02 00 37 06 0D 00 00 00 12 01 73 6D 61 6C 6C 63 68 69".ToHexBytes();
+            byte[] bodys = "000000010000000200BA7F0E07E4F11C0028003C000018071510101001040000006402020037610D0000001201736D616C6C636869".ToHexBytes();
             JT808_0x0200 jT808UploadLocationRequest = JT808Serializer.Deserialize<JT808_0x0200>(bodys);
             Assert.Equal((uint)1, jT808UploadLocationRequest.AlarmFlag);
             Assert.Equal(DateTime.Parse("2018-07-15 10:10:10"), jT808UploadLocationRequest.GPSTime);
@@ -209,12 +214,12 @@ namespace JT808.Protocol.Test.MessageBody
             Assert.Equal(132444444, jT808UploadLocationRequest.Lng);
             Assert.Equal(60, jT808UploadLocationRequest.Speed);
             Assert.Equal((uint)2, jT808UploadLocationRequest.StatusFlag);
-            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
-            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
-            var jT808LocationAttachImpl0x06 = (JT808LocationAttachImpl0x06)jT808UploadLocationRequest.JT808CustomLocationAttachData[0x06];
-            Assert.Equal(18, jT808LocationAttachImpl0x06.Age);
-            Assert.Equal(1, jT808LocationAttachImpl0x06.Gender);
-            Assert.Equal("smallchi", jT808LocationAttachImpl0x06.UserName);
+            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
+            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
+            var jT808LocationAttachImpl0x61 = (JT808LocationAttachImpl0x61)jT808UploadLocationRequest.CustomLocationAttachData[0x61];
+            Assert.Equal(18, jT808LocationAttachImpl0x61.Age);
+            Assert.Equal(1, jT808LocationAttachImpl0x61.Gender);
+            Assert.Equal("smallchi", jT808LocationAttachImpl0x61.UserName);
         }
 
         [Fact]
@@ -238,13 +243,13 @@ namespace JT808.Protocol.Test.MessageBody
                 Speed = 60,
                 Direction = 0,
                 StatusFlag = 2,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
             {
                 Mileage = 100
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
             {
                 Oil = 55
             });
@@ -301,8 +306,23 @@ namespace JT808.Protocol.Test.MessageBody
             Assert.Equal(132444444, jT808UploadLocationRequest.Lng);
             Assert.Equal(60, jT808UploadLocationRequest.Speed);
             Assert.Equal((uint)2, jT808UploadLocationRequest.StatusFlag);
-            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
-            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.JT808LocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
+            Assert.Equal(100, ((JT808_0x0200_0x01)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x01]).Mileage);
+            Assert.Equal(55, ((JT808_0x0200_0x02)jT808UploadLocationRequest.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x02]).Oil);
+        }
+        [Fact]
+        public void Test5_3()
+        {
+            byte[] bytes = "7E0102400C01003000068109024A3130303330303030363831857E".ToHexBytes();
+            var jT808Package = JT808Serializer.Deserialize<JT808Package>(bytes,JT808Version.JTT2013Force);
+            jT808Package.Header.MessageBodyProperty.VersionFlag = false;//修改成 2013协议标识
+            var newBytes = JT808Serializer.Serialize(jT808Package);//重新序列化
+            var jt808PackageNew = JT808Serializer.Deserialize(newBytes);//验证是否修改标识符成功
+        }
+        [Fact]
+        public void Test5_4()
+        {
+            byte[] bytes = "7e0200406c010030000681090e00000000000c0003026c936f074c794c0004036300d7210625155739010400000000052801cc00210625155739054145bbc91e4145a2fa1141450000004145bbc8194145a1370a4145000000240200002a0200002b04000000003001153101125f0a89860418231870850620757e".ToHexBytes();
+            var json = JT808Serializer.Analyze(bytes, JT808Version.JTT2013Force);
         }
         [Fact]
         public void Test6()
@@ -317,13 +337,13 @@ namespace JT808.Protocol.Test.MessageBody
                 Speed = 60,
                 Direction = 0,
                 StatusFlag = 1002222,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
             {
                 Mileage = 100
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
             {
                 Oil = 55
             });
@@ -335,6 +355,52 @@ namespace JT808.Protocol.Test.MessageBody
         {
             byte[] bodys = "000493E0000F4AEE00BA7F0E07E4F11C0028003C000018071510101001040000006402020037".ToHexBytes();
             string json = JT808Serializer.Analyze<JT808_0x0200>(bodys);
+        }
+
+        [Fact]
+        public void Test7()
+        {
+            //"附加信息列表": [
+            //  {
+            //    "[01]附加信息Id": 1,
+            //    "[04]附加信息长度": 4,
+            //    "[000024C7]里程": 9415
+            //  },
+            //  {
+            //    "[2B]附加信息Id": 43,
+            //    "[04]附加信息长度": 4,
+            //    "[0B290B29]模拟量": 187239209
+            //  },
+            //  {
+            //    "[30]附加信息Id": 48,
+            //    "[01]附加信息长度": 1,
+            //    "[17]无线通信网络信号强度": 23
+            //  },
+            //  {
+            //    "[31]附加信息Id": 49,
+            //    "[01]附加信息长度": 1,
+            //    "[1B]GNSS定位卫星数": 27
+            //  },
+            //  {
+            //    "[00]未知附加信息Id": 0,                        坑爹,相同的
+            //    "[04]未知附加信息长度": 4,
+            //    "未知附加信息": "000400CE0B29"
+            //  },
+            //  {
+            //    "[00]未知附加信息Id": 0,                        坑爹,相同的
+            //    "[0C]未知附加信息长度": 12,
+            //    "未知附加信息": "000C00B222222222222222222222"
+            //  },
+            //  {
+            //    "[EB]未知附加信息Id": 235,
+            //    "[0E]未知附加信息长度": 14,
+            //    "未知附加信息": "EB0E000C00B222222222222222222222"
+            //  }
+            //]
+            byte[] bodys = "7E020000520111111111100002000000000000000301789B3406238AFA0000018B00F62104020046090104000024C72B040B290B2930011731011B000400CE0B29000C00B222222222222222222222EB0E000C00B2222222222222222222226C7E".ToHexBytes();
+            var package = JT808Serializer1.Deserialize(bodys);
+            JT808_0x0200 jT808UploadLocationRequest =  (JT808_0x0200)package.Bodies;
+            Assert.Single(jT808UploadLocationRequest.ExceptionLocationAttachOriginalData);
         }
 
         [Fact]
@@ -356,57 +422,57 @@ namespace JT808.Protocol.Test.MessageBody
             jT808UploadLocationRequest.Speed = 60;
             jT808UploadLocationRequest.Direction = 0;
             jT808UploadLocationRequest.StatusFlag = 2;
-            jT808UploadLocationRequest.JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>();
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
+            jT808UploadLocationRequest.BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>();
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x01, new JT808_0x0200_0x01
             {
                 Mileage = 100
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x02, new JT808_0x0200_0x02
             {
                 Oil = 55
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x03, new JT808_0x0200_0x03
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x03, new JT808_0x0200_0x03
             {
                 Speed = 56
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x04, new JT808_0x0200_0x04
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x04, new JT808_0x0200_0x04
             {
                 EventId = 1
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x11, new JT808_0x0200_0x11
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x11, new JT808_0x0200_0x11
             {
                 AreaId = 1,
                 JT808PositionType = Enums.JT808PositionType.圆形区域
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x12, new JT808_0x0200_0x12
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x12, new JT808_0x0200_0x12
             {
                 AreaId = 1,
                 JT808PositionType = Enums.JT808PositionType.圆形区域,
                 Direction = Enums.JT808DirectionType.出
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x13, new JT808_0x0200_0x13
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x13, new JT808_0x0200_0x13
             {
                 DrivenRoute = Enums.JT808DrivenRouteType.过长,
                 DrivenRouteId = 2,
                 Time = 34
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x25, new JT808_0x0200_0x25
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x25, new JT808_0x0200_0x25
             {
                 CarSignalStatus = 23
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x2A, new JT808_0x0200_0x2A
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x2A, new JT808_0x0200_0x2A
             {
                 IOStatus = 244
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x2B, new JT808_0x0200_0x2B
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x2B, new JT808_0x0200_0x2B
             {
                 Analog = 242
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x30, new JT808_0x0200_0x30
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x30, new JT808_0x0200_0x30
             {
                 WiFiSignalStrength = 0x02
             });
-            jT808UploadLocationRequest.JT808LocationAttachData.Add(JT808Constants.JT808_0x0200_0x31, new JT808_0x0200_0x31
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x31, new JT808_0x0200_0x31
             {
                 GNSSCount = 0x05
             });
@@ -467,6 +533,225 @@ namespace JT808.Protocol.Test.MessageBody
             //16
             //7E
         }
+
+        [Fact]
+        public void Test_all_attcahids_json()
+        {
+            var data = "7E0200005C11223344556622B8000000010000000200BA7F0E07E4F11C0028003C00001807151010100104000000640202003703020038040200011105010000000112060100000001011307000000020022012504000000172A0200F42B04000000F2300102310105167E".ToHexBytes();
+            var hex = JT808Serializer.Analyze(data);
+        }
+
+        [Fact]
+        public void Test_JT808_0x0200_0x07_1()
+        {
+            JT808_0x0200 jT808UploadLocationRequest = new JT808_0x0200();
+            jT808UploadLocationRequest.AlarmFlag = 1;
+            jT808UploadLocationRequest.Altitude = 40;
+            jT808UploadLocationRequest.GPSTime = DateTime.Parse("2021-05-28 18:10:10");
+            jT808UploadLocationRequest.Lat = 12222222;
+            jT808UploadLocationRequest.Lng = 132444444;
+            jT808UploadLocationRequest.Speed = 60;
+            jT808UploadLocationRequest.Direction = 0;
+            jT808UploadLocationRequest.StatusFlag = 2;
+            jT808UploadLocationRequest.BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>();
+            jT808UploadLocationRequest.BasicLocationAttachData.Add(JT808Constants.JT808_0x0200_0x07, new JT808_0x0200_0x07
+            {
+                 BeiDou=new List<JT808_0x0200_0x07.SatelliteStatusInformation>()
+                 {
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=1,
+                          Elevation=3,
+                          AzimuthAngle=2
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=2,
+                          Elevation=4,
+                          AzimuthAngle=5
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=3,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=4,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     }
+                 },
+                 GPS=new List<JT808_0x0200_0x07.SatelliteStatusInformation>()
+                 {
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=2,
+                          Elevation=4,
+                          AzimuthAngle=5
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=3,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=4,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     }
+                 },
+                 GLONASS = new List<JT808_0x0200_0x07.SatelliteStatusInformation>
+                 {
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=3,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     },
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=4,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     }
+                 },
+                 Galileo =new List<JT808_0x0200_0x07.SatelliteStatusInformation>
+                 {
+                     new JT808_0x0200_0x07.SatelliteStatusInformation()
+                     {
+                          No=4,
+                          Elevation=5,
+                          AzimuthAngle=6
+                     }
+                  }
+            });
+            var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
+            Assert.Equal("000000010000000200BA7F0E07E4F11C0028003C0000210528181010072C0401030002020400050305000604050006030204000503050006040500060203050006040500060104050006", hex);
+        }
+
+        [Fact]
+        public void Test_JT808_0x0200_0x07_2()
+        {
+            byte[] bytes = "000000010000000200BA7F0E07E4F11C0028003C0000210528181010072C0401030002020400050305000604050006030204000503050006040500060203050006040500060104050006".ToHexBytes();
+            var jT808_0X0200 = JT808Serializer.Deserialize<JT808_0x0200>(bytes);
+            var jT808_0x0200_0x07=(JT808_0x0200_0x07)jT808_0X0200.BasicLocationAttachData[JT808Constants.JT808_0x0200_0x07];
+            Assert.Equal((byte)(4 + (4 * 4 + 4 * 3 + 4 * 2 + 4)), jT808_0x0200_0x07.AttachInfoLength);
+            Assert.Equal(4, jT808_0x0200_0x07.BeiDou.Count);
+            Assert.Equal(3, jT808_0x0200_0x07.GPS.Count);
+            Assert.Equal(2, jT808_0x0200_0x07.GLONASS.Count);
+            Assert.Single(jT808_0x0200_0x07.Galileo);
+        }
+
+        [Fact]
+        public void Test_Device_AttachInfo1_1()
+        {
+            var bytes = "7E0200003F011111111111047D0100000000000C00C30161A2AA06BE84A000070000008C21082422494401040056AF7302020000030200002504000000002B040000000030011B310110FB0200657E".ToHexBytes();
+            JT808Package package = JT808Serializer1.Deserialize(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo1_2()
+        {
+            var bytes = "7E0200003F011111111111047D0100000000000C00C30161A2AA06BE84A000070000008C21082422494401040056AF7302020000030200002504000000002B040000000030011B310110FB0200657E".ToHexBytes();
+            string json = JT808Serializer1.Analyze(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo2_1()
+        {
+            var bytes = "7E020000850222222222220BAF00000000008C0003016892D6067D0154E0004801B2006321082422494701040007FD62030201AC050100060300000007030000002504000000022B04000000F0300118310111E0013DE10800000000000AA9D8E20400000000E30401B218F8E40400000000E50C001C5158001C5158001C5158EA0400001888EB0402000000EE0101F6041298A37E".ToHexBytes();
+            JT808Package package = JT808Serializer1.Deserialize(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo2_2()
+        {
+            var bytes = "7E020000850222222222220BAF00000000008C0003016892D6067D0154E0004801B2006321082422494701040007FD62030201AC050100060300000007030000002504000000022B04000000F0300118310111E0013DE10800000000000AA9D8E20400000000E30401B218F8E40400000000E50C001C5158001C5158001C5158EA0400001888EB0402000000EE0101F6041298A37E".ToHexBytes();
+            string json = JT808Serializer1.Analyze(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo3_1()
+        {
+            var bytes = "7E02000046033333333333061300000000000C0003020FC9E4069B20FC016402F7010421082422495401040005E44203020302060300000007030000002504000000022A0200002B040000000030011C310121D27E".ToHexBytes();
+            JT808Package package = JT808Serializer1.Deserialize(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo3_2()
+        {
+            //7E02000046033333333333061300000000000C0003020FC9E4069B20FC016402F70104210824224954
+            //01
+            //   04
+            //      00 05 E4 42
+            //03
+            //   02
+            //      03 02
+            //06
+            //   03
+            //      00 00 00
+            //07
+            //   03
+            //      00 00 00
+            //25
+            //   04
+            //      00 00 00 02
+            //2A
+            //   02
+            //      00 00
+            //2B
+            //   04
+            //      00 00 00 00
+            //30
+            //   01
+            //      1C
+            //31
+            //   01
+            //      21
+            //D2
+            //7E
+            var bytes = "7E02000046033333333333061300000000000C0003020FC9E4069B20FC016402F7010421082422495401040005E44203020302060300000007030000002504000000022A0200002B040000000030011C310121D27E".ToHexBytes();
+            string json = JT808Serializer1.Analyze(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo4_1()
+        {
+            var bytes = "7E020000810111111111110EB900000800000C0003027D011F0C07591E4F0033032100A521081016572114040000000001040033DA8B030203212504000000002A02000030011F310117710402170C0BEA04020CD303EF04000080007131000000080002020000010000304B475130534C210810165721000500050309000002057100000071000000710100007102AF7E".ToHexBytes();
+            JT808Package package = JT808Serializer1.Deserialize(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo4_2()
+        {
+            var bytes = "7E020000810111111111110EB900000800000C0003027D011F0C07591E4F0033032100A521081016572114040000000001040033DA8B030203212504000000002A02000030011F310117710402170C0BEA04020CD303EF04000080007131000000080002020000010000304B475130534C210810165721000500050309000002057100000071000000710100007102AF7E".ToHexBytes();
+            string json = JT808Serializer1.Analyze(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo5_1()
+        {
+            var bytes = "7E020000520111111111110002000000000000000301789B3406238AFA0000018B00F62104020046090104000024C72B040B290B2930011731011B000400CE0B29000C00B222222222222222222222EB0E000C00B2222222222222222222226C7E".ToHexBytes();
+            var package= JT808Serializer1.Deserialize(bytes);
+        }
+        [Fact]
+        public void Test_Device_AttachInfo5_2()
+        {
+            //7E
+            //020000520111111111110002000000000000000301789B3406238AFA0000018B00F62104020046090104000024C72B040B290B2930011731011B
+            //00
+            //   04
+            //      00 CE 0B 29
+            //00
+            //   0C
+            //      00 B2
+            //           22222222222222222222
+            //EB
+            //   0E
+            //      00 0C
+            //      00 B2
+            //           22222222222222222222
+            //6C
+            //7E
+            var bytes = "7E020000520111111111110002000000000000000301789B3406238AFA0000018B00F62104020046090104000024C72B040B290B2930011731011B000400CE0B29000C00B222222222222222222222EB0E000C00B2222222222222222222226C7E".ToHexBytes();
+            string json = JT808Serializer1.Analyze(bytes);
+        }
         [Fact]
         public void LatLngTest1_1()
         {
@@ -479,7 +764,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = -132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x18000000;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -509,7 +794,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = -132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x18000000 | 0x302;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -539,7 +824,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = 132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x10000000;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -570,7 +855,7 @@ namespace JT808.Protocol.Test.MessageBody
                     Lng = 132444444,
                     Speed = 60,
                     Direction = 0,
-                    JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                    BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
                 };
                 jT808UploadLocationRequest.StatusFlag = 1111;
                 var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -589,7 +874,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = 132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x10000000 | 0x000300;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -619,7 +904,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = -132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x8000000;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -650,7 +935,7 @@ namespace JT808.Protocol.Test.MessageBody
                     Lng = -132444444,
                     Speed = 60,
                     Direction = 0,
-                    JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                    BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
                 };
                 jT808UploadLocationRequest.StatusFlag = 1111;
                 var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();
@@ -669,7 +954,7 @@ namespace JT808.Protocol.Test.MessageBody
                 Lng = -132444444,
                 Speed = 60,
                 Direction = 0,
-                JT808LocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
+                BasicLocationAttachData = new Dictionary<byte, JT808_0x0200_BodyBase>()
             };
             jT808UploadLocationRequest.StatusFlag = 0x8000000|0x6601;
             var hex = JT808Serializer.Serialize(jT808UploadLocationRequest).ToHexString();

@@ -12,7 +12,7 @@ namespace JT808.Protocol
     /// <summary>
     /// JT808数据包
     /// </summary>
-    public class JT808Package:IJT808MessagePackFormatter<JT808Package>, IJT808Analyze
+    public class JT808Package : IJT808MessagePackFormatter<JT808Package>, IJT808Analyze
     {
         /// <summary>
         /// 起始符
@@ -34,6 +34,10 @@ namespace JT808.Protocol
         /// 数据体
         /// </summary>
         public JT808Bodies Bodies { get; set; }
+        /// <summary>
+        /// 分包数据体
+        /// </summary>
+        public byte[] SubDataBodies { get; set; }
         /// <summary>
         /// 校验码
         /// 从消息头开始，同后一字节异或，直到校验码前一个字节，占用一个字节。
@@ -119,7 +123,12 @@ namespace JT808.Protocol
 
         //////////////////////////////////////////////////////////////////////////
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808Package Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             // 1. 验证校验和
@@ -140,19 +149,26 @@ namespace JT808.Protocol
             jT808Package.Header.MsgId = reader.ReadUInt16();
             //  3.2.读取消息体属性
             jT808Package.Header.MessageBodyProperty = new JT808HeaderMessageBodyProperty(reader.ReadUInt16());
-            if (jT808Package.Header.MessageBodyProperty.VersionFlag)
+            if (reader.Version == JT808Version.JTT2013Force)
             {
-                //2019版本
-                jT808Package.Header.ProtocolVersion = reader.ReadByte();
-                //  3.4.读取终端手机号 
-                jT808Package.Header.TerminalPhoneNo = reader.ReadBCD(20, config.Trim);
-                reader.Version = JT808Version.JTT2019;
-            }
-            else
-            {
-                //2013版本
-                //  3.3.读取终端手机号 
                 jT808Package.Header.TerminalPhoneNo = reader.ReadBCD(config.TerminalPhoneNoLength, config.Trim);
+                reader.Version = JT808Version.JTT2013;
+            }
+            else {
+                if (reader.Version == JT808Version.JTT2019 || jT808Package.Header.MessageBodyProperty.VersionFlag)
+                {
+                    //2019版本
+                    jT808Package.Header.ProtocolVersion = reader.ReadByte();
+                    //  3.4.读取终端手机号 
+                    jT808Package.Header.TerminalPhoneNo = reader.ReadBCD(20, config.Trim);
+                    reader.Version = JT808Version.JTT2019;
+                }
+                else
+                {
+                    //2013版本
+                    //  3.3.读取终端手机号 
+                    jT808Package.Header.TerminalPhoneNo = reader.ReadBCD(config.TerminalPhoneNoLength, config.Trim);
+                }
             }
             //  3.4.读取消息流水号
             jT808Package.Header.MsgNum = reader.ReadUInt16();
@@ -168,36 +184,18 @@ namespace JT808.Protocol
             //  4.1.判断有无数据体
             if (jT808Package.Header.MessageBodyProperty.DataLength > 0)
             {
-                if(config.MsgIdFactory.TryGetValue(jT808Package.Header.MsgId,out object instance))
+                if (config.MsgIdFactory.TryGetValue(jT808Package.Header.MsgId, out object instance))
                 {
                     if (jT808Package.Header.MessageBodyProperty.IsPackage)
                     {
-                        if (jT808Package.Header.PackageIndex > 1)
+                        //读取分包的数据体
+                        try
                         {
-                            try
-                            {
-                                //4.2处理第二包之后的分包数据消息体
-                                JT808SplitPackageBodies jT808SplitPackageBodies = new JT808SplitPackageBodies();
-                                jT808Package.Bodies = jT808SplitPackageBodies.Deserialize(ref reader, config);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new JT808Exception(JT808ErrorCode.BodiesParseError, ex);
-                            }
+                            jT808Package.SubDataBodies = reader.ReadArray(jT808Package.Header.MessageBodyProperty.DataLength).ToArray();
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                //4.2.处理消息体
-                                jT808Package.Bodies = JT808MessagePackFormatterResolverExtensions.JT808DynamicDeserialize(
-                                    instance,
-                                    ref reader, config);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new JT808Exception(JT808ErrorCode.BodiesParseError, ex);
-                            }
+                            throw new JT808Exception(JT808ErrorCode.BodiesParseError, ex);
                         }
                     }
                     else
@@ -223,7 +221,12 @@ namespace JT808.Protocol
             // ---------------解包完成--------------
             return jT808Package;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808Package value, IJT808Config config)
         {
             // ---------------开始组包--------------
@@ -234,7 +237,7 @@ namespace JT808.Protocol
             writer.WriteUInt16(value.Header.MsgId);
             //  2.2.消息体属性(包含消息体长度所以先跳过)
             writer.Skip(2, out int msgBodiesPropertyPosition);
-            if (value.Header.MessageBodyProperty.VersionFlag)
+            if (writer.Version == JT808Version.JTT2019 || value.Header.MessageBodyProperty.VersionFlag)
             {
                 //2019版本
                 //  2.3.协议版本号
@@ -269,14 +272,25 @@ namespace JT808.Protocol
                 writer.WriteUInt16(value.Header.PackageIndex);
             }
             int headerLength = writer.GetCurrentPosition();
-            // 3.处理数据体部分
-            if (value.Bodies != null)
+            if (value.Header.MessageBodyProperty.IsPackage)
             {
-                if (!value.Bodies.SkipSerialization)
+                if (value.SubDataBodies != null)
                 {
-                    JT808MessagePackFormatterResolverExtensions.JT808DynamicSerialize(value.Bodies,
-                        ref writer, value.Bodies,
-                        config);
+                    //2.5.3.写入分包数据
+                    writer.WriteArray(value.SubDataBodies);
+                }
+            }
+            else
+            {
+                // 3.处理数据体部分
+                if (value.Bodies != null)
+                {
+                    if (!value.Bodies.SkipSerialization)
+                    {
+                        JT808MessagePackFormatterResolverExtensions.JT808DynamicSerialize(value.Bodies,
+                            ref writer, value.Bodies,
+                            config);
+                    }
                 }
             }
             //  3.1.处理数据体长度
@@ -291,7 +305,12 @@ namespace JT808.Protocol
             writer.WriteEncode();
             // ---------------组包结束--------------
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             // ---------------开始解析对象--------------
@@ -307,29 +326,15 @@ namespace JT808.Protocol
             var msgid = reader.ReadUInt16();
             writer.WriteNumber($"[{msgid.ReadNumber()}]消息Id", msgid);
             ushort messageBodyPropertyValue = reader.ReadUInt16();
-            var headerMessageBodyProperty=new JT808HeaderMessageBodyProperty(messageBodyPropertyValue);
+            var headerMessageBodyProperty = new JT808HeaderMessageBodyProperty(messageBodyPropertyValue);
             //消息体属性对象 开始
             writer.WriteStartObject("消息体属性对象");
             ReadOnlySpan<char> messageBodyPropertyReadOnlySpan = messageBodyPropertyValue.ReadBinary();
             writer.WriteNumber($"[{messageBodyPropertyReadOnlySpan.ToString()}]消息体属性", messageBodyPropertyValue);
-            if (headerMessageBodyProperty.VersionFlag)
+            if (reader.Version == JT808Version.JTT2013Force)
             {
-                writer.WriteNumber( "[bit15]保留", 0);
-                writer.WriteBoolean("[bit14]协议版本标识", headerMessageBodyProperty.VersionFlag);
-                writer.WriteBoolean("[bit13]是否分包", headerMessageBodyProperty.IsPackage);
-                writer.WriteString("[bit10~bit12]数据加密", headerMessageBodyProperty.Encrypt.ToString());
-                writer.WriteNumber("[bit0~bit9]消息体长度", headerMessageBodyProperty.DataLength);
-                //消息体属性对象 结束
-                writer.WriteEndObject();
-                //2019版本
-                var protocolVersion = reader.ReadByte();
-                writer.WriteNumber($"[{protocolVersion.ReadNumber()}]协议版本号(2019)", protocolVersion);
-                //  3.4.读取终端手机号 
-                var terminalPhoneNo = reader.ReadBCD(20, config.Trim);
-                writer.WriteString($"[{terminalPhoneNo}]终端手机号", terminalPhoneNo);
-            }
-            else
-            {
+                reader.Version = JT808Version.JTT2013;
+                writer.WriteString("版本号", JT808Version.JTT2013.ToString());
                 writer.WriteNumber("[bit15]保留", 0);
                 writer.WriteNumber("[bit14]保留", 0);
                 writer.WriteBoolean("[bit13]是否分包", headerMessageBodyProperty.IsPackage);
@@ -338,15 +343,51 @@ namespace JT808.Protocol
                 writer.WriteEndObject();
                 //2013版本
                 //  3.3.读取终端手机号 
-                var terminalPhoneNo = reader.ReadBCD(config.TerminalPhoneNoLength, config.Trim);
+                var terminalPhoneNo = reader.ReadBCD(config.TerminalPhoneNoLength, false);
                 //消息体属性对象 结束
-                writer.WriteString($"[{terminalPhoneNo}]终端手机号", terminalPhoneNo);
+                writer.WriteString($"[{terminalPhoneNo.PadLeft(config.TerminalPhoneNoLength, '0')}]终端手机号", terminalPhoneNo);
+            }
+            else {
+                if (reader.Version == JT808Version.JTT2019 || headerMessageBodyProperty.VersionFlag)
+                {
+                    reader.Version = JT808Version.JTT2019;
+                    writer.WriteString("版本号", JT808Version.JTT2019.ToString());
+                    writer.WriteNumber("[bit15]保留", 0);
+                    writer.WriteBoolean("[bit14]协议版本标识", headerMessageBodyProperty.VersionFlag);
+                    writer.WriteBoolean("[bit13]是否分包", headerMessageBodyProperty.IsPackage);
+                    writer.WriteString("[bit10~bit12]数据加密", headerMessageBodyProperty.Encrypt.ToString());
+                    writer.WriteNumber("[bit0~bit9]消息体长度", headerMessageBodyProperty.DataLength);
+                    //消息体属性对象 结束
+                    writer.WriteEndObject();
+                    //2019版本
+                    var protocolVersion = reader.ReadByte();
+                    writer.WriteNumber($"[{protocolVersion.ReadNumber()}]协议版本号(2019)", protocolVersion);
+                    //  3.4.读取终端手机号 
+                    var terminalPhoneNo = reader.ReadBCD(20, config.Trim);
+                    writer.WriteString($"[{terminalPhoneNo.PadLeft(20, '0')}]终端手机号", terminalPhoneNo);
+                }
+                else
+                {
+                    reader.Version = JT808Version.JTT2013;
+                    writer.WriteString("版本号", JT808Version.JTT2013.ToString());
+                    writer.WriteNumber("[bit15]保留", 0);
+                    writer.WriteNumber("[bit14]保留", 0);
+                    writer.WriteBoolean("[bit13]是否分包", headerMessageBodyProperty.IsPackage);
+                    writer.WriteString("[bit10~bit12]数据加密", headerMessageBodyProperty.Encrypt.ToString());
+                    writer.WriteNumber("[bit0~bit9]消息体长度", headerMessageBodyProperty.DataLength);
+                    writer.WriteEndObject();
+                    //2013版本
+                    //  3.3.读取终端手机号 
+                    var terminalPhoneNo = reader.ReadBCD(config.TerminalPhoneNoLength, false);
+                    //消息体属性对象 结束
+                    writer.WriteString($"[{terminalPhoneNo.PadLeft(config.TerminalPhoneNoLength, '0')}]终端手机号", terminalPhoneNo);
+                }
             }
             //  3.4.读取消息流水号
             var msgNum = reader.ReadUInt16();
             writer.WriteNumber($"[{msgNum.ReadNumber()}]消息流水号", msgNum);
             //  3.5.判断有无分包
-            uint packgeCount=0, packageIndex=0;
+            uint packgeCount = 0, packageIndex = 0;
             if (headerMessageBodyProperty.IsPackage)
             {
                 //3.5.1.读取消息包总数
@@ -360,70 +401,68 @@ namespace JT808.Protocol
             //  4.1.判断有无数据体
             if (headerMessageBodyProperty.DataLength > 0)
             {
-                if (config.MsgIdFactory.TryGetValue(msgid, out object instance))
+                //数据体属性对象 开始
+                writer.WriteStartObject("数据体对象");
+                string description = "数据体";
+                if (headerMessageBodyProperty.IsPackage)
                 {
-                    //数据体属性对象 开始
-                    writer.WriteStartObject("数据体对象");
-                    string description = "数据体";
-                    if (instance is IJT808Description jT808Description)
+                    //读取分包的数据体
+                    try
                     {
-                        //4.2.处理消息体
-                        description = jT808Description.Description;
+                        writer.WriteString($"[分包]数据体", reader.ReadArray(reader.ReadCurrentRemainContentLength()).ToArray().ToHexString());
                     }
-                    if (headerMessageBodyProperty.IsPackage)
+                    catch (IndexOutOfRangeException ex)
                     {
-                        if (packageIndex > 1)
-                        {
-                            try
-                            {
-                                //4.2处理第二包之后的分包数据消息体
-                                writer.WriteString($"[分包]数据体", reader.ReadContent().ToArray().ToHexString());
-                            }
-                            catch (Exception ex)
-                            {
-                                writer.WriteString($"[分包]数据体异常", ex.StackTrace);
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                writer.WriteString($"[分包]{description}", reader.ReadVirtualArray(headerMessageBodyProperty.DataLength).ToArray().ToHexString());
-                                if (instance is IJT808Analyze analyze)
-                                {
-                                    //4.2.处理消息体
-                                    analyze.Analyze(ref reader, writer, config);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                writer.WriteString($"[分包]数据体异常", ex.StackTrace);
-                            }
-                        }
+                        writer.WriteString($"数据体解析异常,无可用数据体进行解析", ex.StackTrace);
                     }
-                    else
+                    catch (ArgumentOutOfRangeException ex)
                     {
+                        writer.WriteString($"[分包]数据体解析异常,无可用数据体进行解析", ex.StackTrace);
+                    }
+                    catch (Exception ex)
+                    {
+                        writer.WriteString($"[分包]数据体异常", ex.StackTrace);
+                    }
+                }
+                else
+                {
+                    if (config.MsgIdFactory.TryGetValue(msgid, out object instance))
+                    {
+                        if (instance is IJT808Description jT808Description)
+                        {
+                            //4.2.处理消息体
+                            description = jT808Description.Description;
+                        }
                         try
                         {
-                            writer.WriteString($"{description}", reader.ReadVirtualArray(headerMessageBodyProperty.DataLength).ToArray().ToHexString());
+                            //数据体长度正常
+                            writer.WriteString($"{description}", reader.ReadVirtualArray(reader.ReadCurrentRemainContentLength()).ToArray().ToHexString());
                             if (instance is IJT808Analyze analyze)
                             {
                                 //4.2.处理消息体
                                 analyze.Analyze(ref reader, writer, config);
                             }
                         }
+                        catch (IndexOutOfRangeException ex)
+                        {
+                            writer.WriteString($"数据体解析异常,无可用数据体进行解析", ex.StackTrace);
+                        }
+                        catch (ArgumentOutOfRangeException ex)
+                        {
+                            writer.WriteString($"数据体解析异常,无可用数据体进行解析", ex.StackTrace);
+                        }
                         catch (Exception ex)
                         {
                             writer.WriteString($"数据体异常", ex.StackTrace);
                         }
                     }
-                    //数据体属性对象 结束
-                    writer.WriteEndObject();
+                    else
+                    {
+                        writer.WriteString($"[未知]数据体", reader.ReadArray(reader.ReadCurrentRemainContentLength()).ToArray().ToHexString());
+                    }
                 }
-                else
-                {
-                    writer.WriteNull($"[Null]数据体");
-                }
+                //数据体属性对象 结束
+                writer.WriteEndObject();
             }
             else
             {
@@ -446,13 +485,27 @@ namespace JT808.Protocol
                     writer.WriteNull($"[Null]数据体");
                 }
             }
-            // 5.读取校验码
-            reader.ReadByte();
-            writer.WriteNumber($"[{reader.RealCheckXorCode.ReadNumber()}]校验码", reader.RealCheckXorCode);
-            // 6.读取终止位置
-            byte end = reader.ReadEnd();
-            writer.WriteNumber($"[{end.ReadNumber()}]结束", end);
-            writer.WriteEndObject();
+            try
+            {
+                // 5.读取校验码
+                reader.ReadByte();
+                writer.WriteNumber($"[{reader.RealCheckXorCode.ReadNumber()}]校验码", reader.RealCheckXorCode);
+                // 6.读取终止位置
+                byte end = reader.ReadEnd();
+                writer.WriteNumber($"[{end.ReadNumber()}]结束", end);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                writer.WriteString($"数据解析异常,无可用数据进行解析", ex.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                writer.WriteString($"数据解析异常", ex.StackTrace);
+            }
+            finally
+            {
+                writer.WriteEndObject();
+            }
         }
     }
 }

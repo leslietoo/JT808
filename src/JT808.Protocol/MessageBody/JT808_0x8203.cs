@@ -3,6 +3,7 @@ using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
 using System;
+using System.Linq;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -13,7 +14,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8203 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8203>, IJT808Analyze
     {
+        /// <summary>
+        /// 0x8203
+        /// </summary>
         public override ushort MsgId { get; } = 0x8203;
+        /// <summary>
+        /// 人工确认报警消息
+        /// </summary>
         public override string Description => "人工确认报警消息";
         /// <summary>
         /// 报警消息流水号
@@ -24,7 +31,12 @@ namespace JT808.Protocol.MessageBody
         /// 人工确认报警类型
         /// </summary>
         public uint ManualConfirmAlarmType { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8203 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8203 jT808_0X8203 = new JT808_0x8203();
@@ -32,13 +44,23 @@ namespace JT808.Protocol.MessageBody
             jT808_0X8203.ManualConfirmAlarmType = reader.ReadUInt32();
             return jT808_0X8203;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8203 value, IJT808Config config)
         {
             writer.WriteUInt16(value.AlarmMsgNum);
             writer.WriteUInt32(value.ManualConfirmAlarmType);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8203 value = new JT808_0x8203();
@@ -46,7 +68,7 @@ namespace JT808.Protocol.MessageBody
             writer.WriteNumber($"[{ value.AlarmMsgNum.ReadNumber()}]报警消息流水号", value.AlarmMsgNum);
             value.ManualConfirmAlarmType = reader.ReadUInt32();
             writer.WriteNumber($"[{ value.ManualConfirmAlarmType.ReadNumber()}]人工确认报警类型", value.ManualConfirmAlarmType);
-            ReadOnlySpan<char> manualConfirmAlarmTypeBits = Convert.ToString(value.ManualConfirmAlarmType, 2).PadLeft(32, '0').AsSpan();
+            ReadOnlySpan<char> manualConfirmAlarmTypeBits =string.Join("", Convert.ToString(value.ManualConfirmAlarmType, 2).PadLeft(32, '0').Reverse()).AsSpan();
             writer.WriteStartObject($"人工确认报警对象[{manualConfirmAlarmTypeBits.ToString()}]");
             writer.WriteString("[bit29~bit31]保留", manualConfirmAlarmTypeBits.Slice(29,3).ToString());
             writer.WriteString($"[bit28]{manualConfirmAlarmTypeBits[28]}","确认车辆非法位移报警");

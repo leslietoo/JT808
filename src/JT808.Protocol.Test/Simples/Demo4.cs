@@ -9,7 +9,7 @@ using System.Text;
 using Xunit;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.MessagePack;
-using JT808.Protocol.Attributes;
+
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using JT808.Protocol.Internal;
@@ -22,7 +22,7 @@ namespace JT808.Protocol.Test.Simples
         {
 
         }
-        private Dictionary<string, DeviceType> cache = new Dictionary<string, DeviceType>
+        private readonly Dictionary<string, DeviceType> cache = new Dictionary<string, DeviceType>
         {
             { "123456789012",DeviceType.DT1 },
             { "123456789013",DeviceType.DT2 }
@@ -48,7 +48,7 @@ namespace JT808.Protocol.Test.Simples
                                             Speed = 60,
                                             Direction = 0,
                                             StatusFlag = 2,
-                                            JT808CustomLocationAttachData = new Dictionary<byte, JT808_0x0200_CustomBodyBase>
+                                            CustomLocationAttachData = new Dictionary<byte, JT808_0x0200_CustomBodyBase>
                                                 {
                                                     {0x81,new JT808_0x0200_DT1_0x81 {
                                                         Age=15,
@@ -62,7 +62,7 @@ namespace JT808.Protocol.Test.Simples
             var jT808PackageResult = demo5JT808Serializer.Deserialize<JT808Package>(data);
             JT808_0x0200 jT808_0X0200 = jT808PackageResult.Bodies as JT808_0x0200;
 
-            var attach = DeviceTypeFactory.Create(cache[jT808PackageResult.Header.TerminalPhoneNo], jT808_0X0200.JT808CustomLocationAttachData);
+            var attach = DeviceTypeFactory.Create(cache[jT808PackageResult.Header.TerminalPhoneNo], jT808_0X0200.CustomLocationAttachData);
             var extJson = attach.ExtData.Data.ToString(Formatting.None);
             var attachinfo81 = (JT808_0x0200_DT1_0x81)attach.JT808CustomLocationAttachData[0x81];
             Assert.Equal((uint)15, attachinfo81.Age);
@@ -84,7 +84,7 @@ namespace JT808.Protocol.Test.Simples
 
     public class JT808_0x0200_DT1_0x81_ExtDataProcessor : IExtDataProcessor
     {
-        private JT808_0x0200_DT1_0x81 jT808_0X0200_DT1_0X81;
+        private readonly JT808_0x0200_DT1_0x81 jT808_0X0200_DT1_0X81;
         public JT808_0x0200_DT1_0x81_ExtDataProcessor(JT808_0x0200_DT1_0x81 jT808_0X0200_DT1_0X81)
         {
             this.jT808_0X0200_DT1_0X81 = jT808_0X0200_DT1_0X81;
@@ -99,7 +99,7 @@ namespace JT808.Protocol.Test.Simples
 
     public class JT808_0x0200_DT1_0x82_ExtDataProcessor : IExtDataProcessor
     {
-        private JT808_0x0200_DT1_0x82 jT808_0X0200_DT1_0X82;
+        private readonly JT808_0x0200_DT1_0x82 jT808_0X0200_DT1_0X82;
         public JT808_0x0200_DT1_0x82_ExtDataProcessor(JT808_0x0200_DT1_0x82 jT808_0X0200_DT1_0X82)
         {
             this.jT808_0X0200_DT1_0X82 = jT808_0X0200_DT1_0X82;
@@ -112,7 +112,7 @@ namespace JT808.Protocol.Test.Simples
 
     public class JT808_0x0200_DT2_0x81_ExtDataProcessor : IExtDataProcessor
     {
-        private JT808_0x0200_DT2_0x81 jT808_0X0200_DT2_0X81;
+        private readonly JT808_0x0200_DT2_0x81 jT808_0X0200_DT2_0X81;
         public JT808_0x0200_DT2_0x81_ExtDataProcessor(JT808_0x0200_DT2_0x81 jT808_0X0200_DT2_0X81)
         {
             this.jT808_0X0200_DT2_0X81 = jT808_0X0200_DT2_0X81;
@@ -128,15 +128,12 @@ namespace JT808.Protocol.Test.Simples
     {
         public static DeviceTypeBase Create(DeviceType deviceType, Dictionary<byte, JT808_0x0200_CustomBodyBase> jT808CustomLocationAttachData)
         {
-            switch (deviceType)
+            return deviceType switch
             {
-                case DeviceType.DT1:
-                    return new DeviceType1(jT808CustomLocationAttachData);
-                case DeviceType.DT2:
-                    return new DeviceType2(jT808CustomLocationAttachData);
-                default:
-                    return default;
-            }
+                DeviceType.DT1 => new DeviceType1(jT808CustomLocationAttachData),
+                DeviceType.DT2 => new DeviceType2(jT808CustomLocationAttachData),
+                _ => default,
+            };
         }
     }
 

@@ -5,6 +5,7 @@ using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -14,7 +15,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8500 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8500>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x8500
+        /// </summary>
         public override ushort MsgId { get; } = 0x8500;
+        /// <summary>
+        /// 车辆控制
+        /// </summary>
         public override string Description => "车辆控制";
         /// <summary>
         /// 控制标志 
@@ -35,7 +42,12 @@ namespace JT808.Protocol.MessageBody
         /// 用于序列化的时候,由于厂家自定义类型比较多，所以直接用JT808_0x8500_ControlType
         /// </summary>
         public List<JT808_0x8500_ControlType> ControlTypes { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8500 value = new JT808_0x8500();
@@ -65,14 +77,19 @@ namespace JT808.Protocol.MessageBody
             {
                 value.ControlFlag = reader.ReadByte();
                 writer.WriteNumber($"[{ value.ControlFlag.ReadNumber()}]控制标志", value.ControlFlag);
-                ReadOnlySpan<char> controlFlagBits = Convert.ToString(value.ControlFlag, 2).PadLeft(8, '0').AsSpan();
+                ReadOnlySpan<char> controlFlagBits =string.Join("", Convert.ToString(value.ControlFlag, 2).PadLeft(8, '0').Reverse()).AsSpan();
                 writer.WriteStartObject($"控制标志对象[{controlFlagBits.ToString()}]");
                 writer.WriteString("[bit1~bit7]保留", controlFlagBits.Slice(1, 7).ToString());
                 writer.WriteString("[bit0]", controlFlagBits[0]=='0'? "车门解锁" : "车门加锁");
                 writer.WriteEndObject();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8500 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8500 value = new JT808_0x8500();
@@ -99,6 +116,12 @@ namespace JT808.Protocol.MessageBody
             }
             return value;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8500 value, IJT808Config config)
         {
             if (writer.Version == JT808Version.JTT2019)

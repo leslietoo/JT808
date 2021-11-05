@@ -6,6 +6,7 @@ using JT808.Protocol.MessagePack;
 using JT808.Protocol.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace JT808.Protocol.MessageBody
@@ -16,7 +17,13 @@ namespace JT808.Protocol.MessageBody
     /// </summary>
     public class JT808_0x8602 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x8602>, IJT808Analyze, IJT808_2019_Version
     {
+        /// <summary>
+        /// 0x8602
+        /// </summary>
         public override ushort MsgId { get; } = 0x8602;
+        /// <summary>
+        /// 设置矩形区域
+        /// </summary>
         public override string Description => "设置矩形区域";
         /// <summary>
         /// 设置属性
@@ -31,7 +38,12 @@ namespace JT808.Protocol.MessageBody
         /// 区域项
         /// </summary>
         public List<JT808RectangleAreaProperty> AreaItems { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public JT808_0x8602 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x8602 jT808_0X8602 = new JT808_0x8602();
@@ -51,8 +63,8 @@ namespace JT808.Protocol.MessageBody
                 bool bit0Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 1).ToString().Equals("0");
                 if (!bit0Flag)
                 {
-                    areaProperty.StartTime = reader.ReadDateTime6();
-                    areaProperty.EndTime = reader.ReadDateTime6();
+                    areaProperty.StartTime = reader.ReadDateTime_yyMMddHHmmss();
+                    areaProperty.EndTime = reader.ReadDateTime_yyMMddHHmmss();
                 }
                 bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");
                 if (!bit1Flag)
@@ -73,7 +85,12 @@ namespace JT808.Protocol.MessageBody
             }
             return jT808_0X8602;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x8602 value, IJT808Config config)
         {
             writer.WriteByte(value.SettingAreaProperty);
@@ -94,11 +111,11 @@ namespace JT808.Protocol.MessageBody
                     {
                         if (item.StartTime.HasValue)
                         {
-                            writer.WriteDateTime6(item.StartTime.Value);
+                            writer.WriteDateTime_yyMMddHHmmss(item.StartTime.Value);
                         }
                         if (item.EndTime.HasValue)
                         {
-                            writer.WriteDateTime6(item.EndTime.Value);
+                            writer.WriteDateTime_yyMMddHHmmss(item.EndTime.Value);
                         }
                     }
                     bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");
@@ -126,7 +143,12 @@ namespace JT808.Protocol.MessageBody
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
+        /// <param name="config"></param>
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x8602 value = new JT808_0x8602();
@@ -142,7 +164,7 @@ namespace JT808.Protocol.MessageBody
                 areaProperty.AreaId = reader.ReadUInt32();
                 writer.WriteNumber($"[{areaProperty.AreaId.ReadNumber()}]区域ID", areaProperty.AreaId);
                 areaProperty.AreaProperty = reader.ReadUInt16();
-                ReadOnlySpan<char> areaPropertyBits = Convert.ToString(areaProperty.AreaProperty, 2).PadLeft(16, '0').AsSpan();
+                ReadOnlySpan<char> areaPropertyBits =string.Join("", Convert.ToString(areaProperty.AreaProperty, 2).PadLeft(16, '0').Reverse()).AsSpan();
                 writer.WriteStartObject($"区域属性对象[{areaPropertyBits.ToString()}]");
                 if (reader.Version == JT808Version.JTT2019)
                 {
@@ -185,16 +207,16 @@ namespace JT808.Protocol.MessageBody
                 writer.WriteNumber($"[{areaProperty.LowRightPointLat.ReadNumber()}]右下点纬度", areaProperty.LowRightPointLat);
                 areaProperty.LowRightPointLng = reader.ReadUInt32();
                 writer.WriteNumber($"[{areaProperty.LowRightPointLng.ReadNumber()}]右下点经度", areaProperty.LowRightPointLng);
-                ReadOnlySpan<char> areaProperty16Bit = Convert.ToString(areaProperty.AreaProperty, 2).PadLeft(16, '0').AsSpan();
-                bool bit0Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 1).ToString().Equals("0");
+                ReadOnlySpan<char> areaProperty16Bit =string.Join("", Convert.ToString(areaProperty.AreaProperty, 2).PadLeft(16, '0').Reverse()).AsSpan();
+                bool bit0Flag = areaProperty16Bit.Slice(0,1).ToString().Equals("0");
                 if (!bit0Flag)
                 {
-                    areaProperty.StartTime = reader.ReadDateTime6();
+                    areaProperty.StartTime = reader.ReadDateTime_yyMMddHHmmss();
                     writer.WriteString($"[{ areaProperty.StartTime.Value.ToString("yyMMddHHmmss")}]起始时间", areaProperty.StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-                    areaProperty.EndTime = reader.ReadDateTime6();
+                    areaProperty.EndTime = reader.ReadDateTime_yyMMddHHmmss();
                     writer.WriteString($"[{ areaProperty.EndTime.Value.ToString("yyMMddHHmmss")}]起始时间", areaProperty.EndTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
-                bool bit1Flag = areaProperty16Bit.Slice(areaProperty16Bit.Length - 2, 1).ToString().Equals("0");
+                bool bit1Flag = areaProperty16Bit.Slice(1, 1).ToString().Equals("0");
                 if (!bit1Flag)
                 {
                     areaProperty.HighestSpeed = reader.ReadUInt16();

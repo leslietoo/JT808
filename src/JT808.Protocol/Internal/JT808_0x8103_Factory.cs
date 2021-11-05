@@ -46,6 +46,7 @@ namespace JT808.Protocol.Interfaces
             Map.Add(JT808Constants.JT808_0x8103_0x002F, new JT808_0x8103_0x002F());
             Map.Add(JT808Constants.JT808_0x8103_0x0030, new JT808_0x8103_0x0030());
             Map.Add(JT808Constants.JT808_0x8103_0x0031, new JT808_0x8103_0x0031());
+            Map.Add(JT808Constants.JT808_0x8103_0x0032, new JT808_0x8103_0x0032());
             Map.Add(JT808Constants.JT808_0x8103_0x0040, new JT808_0x8103_0x0040());
             Map.Add(JT808Constants.JT808_0x8103_0x0041, new JT808_0x8103_0x0041());
             Map.Add(JT808Constants.JT808_0x8103_0x0042, new JT808_0x8103_0x0042());
@@ -74,7 +75,7 @@ namespace JT808.Protocol.Interfaces
             Map.Add(JT808Constants.JT808_0x8103_0x0064, new JT808_0x8103_0x0064());
             Map.Add(JT808Constants.JT808_0x8103_0x0065, new JT808_0x8103_0x0065());
             Map.Add(JT808Constants.JT808_0x8103_0x0070, new JT808_0x8103_0x0070());
-            Map.Add(JT808Constants.JT808_0x8103_0x0071, new JT808_0x8103_0x0081());
+            Map.Add(JT808Constants.JT808_0x8103_0x0071, new JT808_0x8103_0x0071());
             Map.Add(JT808Constants.JT808_0x8103_0x0072, new JT808_0x8103_0x0072());
             Map.Add(JT808Constants.JT808_0x8103_0x0073, new JT808_0x8103_0x0073());
             Map.Add(JT808Constants.JT808_0x8103_0x0074, new JT808_0x8103_0x0074());
@@ -109,7 +110,7 @@ namespace JT808.Protocol.Interfaces
                 {
                     paramId = (uint)type.GetProperty(nameof(JT808_0x8103_BodyBase.ParamId)).GetValue(instance);
                 }
-                catch (Exception ex)
+                catch
                 {
                     continue;
                 }
