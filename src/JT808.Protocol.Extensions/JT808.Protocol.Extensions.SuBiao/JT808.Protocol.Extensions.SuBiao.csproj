@@ -7,15 +7,26 @@
     <PackageReleaseNotes>基于JT808协议、GB808协议扩展的主动安全消息协议(苏标)</PackageReleaseNotes>
     <DocumentationFile>JT808.Protocol.Extensions.SuBiao.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\LICENSE" Pack="true" PackagePath=""/>
-    <None Include="..\..\..\README.md" Pack="true" PackagePath=""/>
+    <None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\..\..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 
   <ItemGroup>
     <ProjectReference Include="..\..\JT808.Protocol\JT808.Protocol.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 

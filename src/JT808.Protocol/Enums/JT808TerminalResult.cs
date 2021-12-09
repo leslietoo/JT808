@@ -13,22 +13,22 @@ namespace JT808.Protocol.Enums
         [Description("succeed")]
         Success = 0x00,
 
-        [Description("failed")]
         /// <summary>
         /// 失败
         /// </summary>
+        [Description("failed")]
         Fail = 0x01,
 
-        [Description("message error")]
         /// <summary>
         /// 消息有误
         /// </summary>
+        [Description("message error")]
         MessageError = 0x02,
 
-        [Description("not supported")]
         /// <summary>
         /// 不支持
         /// </summary>
+        [Description("not supported")]
         NotSupport = 0x03
     }
 }
