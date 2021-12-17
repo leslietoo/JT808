@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 休眠时汇报时间间隔，单位为秒（s），>0
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0027 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0027>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 休眠时汇报时间间隔，单位为秒（s），>0
         /// </summary>
+        [JsonProperty("sleepGpsIntvl")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 休眠时汇报时间间隔

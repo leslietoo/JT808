@@ -3,6 +3,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System;
 using System.Text.Json;
 
@@ -12,6 +13,7 @@ namespace JT808.Protocol.MessageBody
     /// 服务器 TCP 端口
     /// 2019版本已作为保留
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0018 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0018>, IJT808_2019_Version, IJT808Analyze
     {
         /// <summary>
@@ -26,6 +28,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         ///服务器 TCP 端口
         /// </summary>
+        [JsonProperty("masterPort")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 服务器TCP端口

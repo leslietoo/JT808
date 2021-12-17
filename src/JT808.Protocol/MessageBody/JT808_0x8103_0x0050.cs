@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 报警屏蔽字，与位置信息汇报消息中的报警标志相对应，相应位为 1则相应报警被屏蔽
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0050 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0050>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 报警屏蔽字，与位置信息汇报消息中的报警标志相对应，相应位为 1则相应报警被屏蔽
         /// </summary>
+        [JsonProperty("alarmMask")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 报警屏蔽字

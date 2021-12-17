@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 电子围栏半径（非法位移阈值），单位为米
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0031 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0031>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 电子围栏半径（非法位移阈值），单位为米
         /// </summary>
+        [JsonProperty("fenceRadius")]
         public ushort ParamValue { get; set; }
         /// <summary>
         /// 电子围栏半径

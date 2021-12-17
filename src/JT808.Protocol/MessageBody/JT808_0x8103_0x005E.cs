@@ -4,6 +4,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -11,6 +12,7 @@ namespace JT808.Protocol.MessageBody
     /// 侧翻报警参数设置：
     /// 侧翻角度，单位 1 度，默认为 30 度
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x005E : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x005E>, IJT808Analyze
     {
         /// <summary>
@@ -26,6 +28,7 @@ namespace JT808.Protocol.MessageBody
         /// 侧翻报警参数设置：
         /// 侧翻角度，单位 1 度，默认为 30 度
         /// </summary>
+        [JsonProperty("turnoverAlarmParam")]
         public ushort ParamValue { get; set; }
         /// <summary>
         /// 侧翻报警参数设置

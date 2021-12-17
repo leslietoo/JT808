@@ -1,6 +1,7 @@
 ﻿using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System.Text.Json;
 
 namespace JT808.Protocol.Extensions.JT1078.MessageBody
@@ -9,23 +10,28 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     /// 音视频通道列表设置
     /// 0x8103_0x0076_AVChannelRefTable
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0076_AVChannelRefTable: IJT808MessagePackFormatter<JT808_0x8103_0x0076_AVChannelRefTable>, IJT808Analyze
     {
         /// <summary>
         /// 物理通道号
         /// </summary>
+        [JsonProperty("phisicalChNo")]
         public byte PhysicalChannelNo { get; set; }
         /// <summary>
         /// 逻辑通道号
         /// </summary>
+        [JsonProperty("logicalChNo")]
         public byte LogicChannelNo { get; set; }
         /// <summary>
         /// 通道类型
         /// </summary>
+        [JsonProperty("chType")]
         public byte ChannelType { get; set; }
         /// <summary>
         /// 是否链接云台
         /// </summary>
+        [JsonProperty("ptzConnected")]
         public byte IsConnectCloudPlat { get; set; }
         /// <summary>
         /// 

@@ -4,6 +4,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -11,6 +12,7 @@ namespace JT808.Protocol.MessageBody
     /// 终端心跳发送间隔，单位为秒（s）
     /// 0x8103_0x0001
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0001 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0001>, IJT808Analyze
     {
         /// <summary>
@@ -25,6 +27,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 终端心跳发送间隔，单位为秒（s）
         /// </summary>
+        [JsonProperty("heartBeat")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 终端心跳发送间隔

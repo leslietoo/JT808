@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 位置汇报策略，0：定时汇报；1：定距汇报；2：定时和定距汇报
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0020 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0020>, IJT808Analyze
     {
         /// <summary>
@@ -27,6 +29,7 @@ namespace JT808.Protocol.MessageBody
         /// 1：定距汇报；
         /// 2：定时和定距汇报
         /// </summary>
+        [JsonProperty("gpsStategy")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 位置汇报策略

@@ -2,6 +2,7 @@
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessageBody;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -12,6 +13,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     /// 音视频通道列表设置
     /// 0x8103_0x0076
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0076 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0076>, IJT808Analyze
     {
         /// <summary>
@@ -26,21 +28,25 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         /// 音视频通道总数
         /// l
         /// </summary>
+        [JsonProperty("avChCnt")]
         public byte AVChannelTotal { get; set; }
         /// <summary>
         /// 音频通道总数
         /// m
         /// </summary>
+        [JsonProperty("audioChCnt")]
         public byte AudioChannelTotal { get; set; }
         /// <summary>
         /// 视频通道总数
         /// n
         /// </summary>
+        [JsonProperty("videoChCnt")]
         public byte VudioChannelTotal { get; set; }
         /// <summary>
         /// 音视频通道对照表
         /// 4*(l+m+n)
         /// </summary>
+        [JsonProperty("chAttribs")]
         public List<JT808_0x8103_0x0076_AVChannelRefTable> AVChannelRefTables { get; set; }
         /// <summary>
         /// 音视频通道列表设置

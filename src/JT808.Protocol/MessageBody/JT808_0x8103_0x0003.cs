@@ -4,6 +4,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -11,6 +12,7 @@ namespace JT808.Protocol.MessageBody
     /// TCP 消息重传次数
     /// 0x8103_0x0003
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0003 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0003>, IJT808Analyze
     {
         /// <summary>
@@ -25,6 +27,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// TCP 消息重传次数
         /// </summary>
+        [JsonProperty("tcpResendCnt")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// TCP消息重传次数

@@ -3,12 +3,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 主服务器无线通信拨号密码
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0012 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0012>, IJT808Analyze
     {
         /// <summary>
@@ -23,6 +25,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 主服务器无线通信拨号密码
         /// </summary>
+        [JsonProperty("masterPwd")]
         public string ParamValue { get; set; }
         /// <summary>
         /// 主服务器无线通信拨号密码

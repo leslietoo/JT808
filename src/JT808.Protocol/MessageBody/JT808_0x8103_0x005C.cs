@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 疲劳驾驶预警差值，单位为秒（s），>0
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x005C : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x005C>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 疲劳驾驶预警差值，单位为秒（s），>0
         /// </summary>
+        [JsonProperty("fatigueWarnDiff")]
         public ushort ParamValue { get; set; }
         /// <summary>
         /// 疲劳驾驶预警差值

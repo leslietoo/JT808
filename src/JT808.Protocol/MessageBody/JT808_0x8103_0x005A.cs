@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 最长停车时间，单位为秒（s）
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x005A : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x005A>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 最长停车时间，单位为秒（s）
         /// </summary>
+        [JsonProperty("maxStop")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 最长停车时间

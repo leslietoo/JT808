@@ -4,6 +4,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -12,6 +13,7 @@ namespace JT808.Protocol.MessageBody
     /// b7-b0： 碰撞时间，单位 4ms；
     /// b15-b8：碰撞加速度，单位 0.1g，设置范围在：0-79 之间，默认为10。
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x005D : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x005D>, IJT808Analyze
     {
         /// <summary>
@@ -28,6 +30,7 @@ namespace JT808.Protocol.MessageBody
         /// b7-b0： 碰撞时间，单位4ms；
         /// b15-b8：碰撞加速度，单位 0.1g，设置范围在：0-79 之间，默认为10。
         /// </summary>
+        [JsonProperty("crashAlarmParam")]
         public ushort ParamValue { get; set; }
         /// <summary>
         /// 碰撞报警参数设置

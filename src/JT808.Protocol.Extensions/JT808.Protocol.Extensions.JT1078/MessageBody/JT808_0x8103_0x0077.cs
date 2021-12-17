@@ -2,6 +2,7 @@
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessageBody;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -12,6 +13,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     ///单独视频通道参数设置
     /// 0x8103_0x0077
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0077 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0077>, IJT808Analyze
     {
         /// <summary>
@@ -25,10 +27,12 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         /// <summary>
         /// 需单独设置视频参数的通道数量 用n表示
         /// </summary>
+        [JsonProperty("chCnt")]
         public byte NeedSetChannelTotal { get; set; }
         /// <summary>
         /// 
         /// </summary>
+        [JsonProperty("chAttribs")]
         public List<JT808_0x8103_0x0077_SignalChannel> SignalChannels { get; set; }
         /// <summary>
         /// 单独视频通道参数设置

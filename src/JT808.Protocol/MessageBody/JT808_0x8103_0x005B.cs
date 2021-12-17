@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 超速报警预警差值，单位为 1/10Km/h
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x005B : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x005B>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// 超速报警预警差值，单位为 1/10Km/h
         /// </summary>
+        [JsonProperty("overSpeedWarnDiff")]
         public ushort ParamValue { get; set; }
         /// <summary>
         /// 超速报警预警差值

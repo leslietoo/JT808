@@ -3,6 +3,7 @@ using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessageBody;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System;
 using System.Text.Json;
 
@@ -11,6 +12,7 @@ namespace JT808.Protocol.Extensions.SuBiao.MessageBody
     /// <summary>
     /// 高级驾驶辅助系统参数
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0xF364 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0xF364>, IJT808Analyze
     {
         /// <summary>
@@ -24,48 +26,59 @@ namespace JT808.Protocol.Extensions.SuBiao.MessageBody
         /// <summary>
         /// 报警判断速度阈值
         /// </summary>
+        [JsonProperty("alarmSpdLimit")]
         public byte AlarmJudgeSpeedThreshold { get; set; }
         /// <summary>
         /// 报警提示音量
         /// </summary>
+        [JsonProperty("alarmVol")]
         public byte WarningVolume { get; set; }
         /// <summary>
         /// 主动拍照策略
         /// <see cref="JT808.Protocol.Extensions.SuBiao.Enums.ActivePhotographyStrategyType"/>
         /// </summary>
+        [JsonProperty("activeShotStrategy")]
         public byte ActivePhotographyStrategy { get; set; }
         /// <summary>
         /// 主动定时拍照时间间隔
         /// </summary>
+        [JsonProperty("activeShotTimeIntvl")]
         public ushort ActivelyTimePhotoInterval { get; set; }
         /// <summary>
         /// 主动定距拍照距离间隔
         /// </summary>
+        [JsonProperty("activeShotDistIntvl")]
         public ushort ActiveDistancePhotographyDistanceInterval { get; set; }
         /// <summary>
         /// 单次主动拍照张数
         /// </summary>
+        [JsonProperty("eachShotPicCnt")]
         public byte SingleInitiativePhotos { get; set; }
         /// <summary>
         /// 单次主动拍照时间间隔
         /// </summary>
+        [JsonProperty("eachShotPicIntvl")]
         public byte SingleInitiativePhotosInterval { get; set; }
         /// <summary>
         /// 拍照分辨率
         /// <see cref="JT808.Protocol.Extensions.SuBiao.Enums.PhotoResolutionType"/>
         /// </summary>
+        [JsonProperty("picRes")]
         public byte PhotoResolution { get; set; }
         /// <summary>
         /// 视频录制分辨率
         /// </summary>
+        [JsonProperty("videoRes")]
         public byte VideoRecordingResolution { get; set; }
         /// <summary>
         /// 报警使能
         /// </summary>
+        [JsonProperty("alarmEnable")]
         public uint AlarmEnable { get; set; }
         /// <summary>
         /// 事件使能
         /// </summary>
+        [JsonProperty("eventEnable")]
         public uint EventEnable { get; set; }
         /// <summary>
         /// 预留字段
@@ -74,131 +87,163 @@ namespace JT808.Protocol.Extensions.SuBiao.MessageBody
         /// <summary>
         /// 障碍物报警距离阈值
         /// </summary>
+        [JsonProperty("blockAlarmDistLmt")]
         public byte DistanceThresholdObstacleAlarm { get; set; }
         /// <summary>
         /// 障碍物报警分级速度阈值
         /// </summary>
+        [JsonProperty("blockAlarmLevelSpdLmt")]
         public byte HierarchicalSpeedThresholdObstacleAlarm { get; set; }
         /// <summary>
         /// 障碍物报警前后视频录制时间
         /// </summary>
+        [JsonProperty("blockAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterObstacleAlarm { get; set; }
         /// <summary>
         /// 障碍物报警拍照张数
         /// </summary>
+        [JsonProperty("blockAlarmPicCnt")]
         public byte BarrierAlarmPhotographs { get; set; }
         /// <summary>
         /// 障碍物报警拍照间隔
         /// </summary>
+        [JsonProperty("blockAlarmShotIntvl")]
         public byte ObstacleAlarmInterval { get; set; }
         /// <summary>
         /// 频繁变道报警判断时间段
         /// </summary>
+        [JsonProperty("laneChgAlarmDurLmt")]
         public byte FrequentChannelChangeAlarmJudgmentTimePeriod { get; set; }
 
         /// <summary>
         /// 频繁变道报警判断次数
         /// </summary>
+        [JsonProperty("laneChgAlarmCntLmt")]
         public byte FrequentAlarmJudgmentNumberChannelChange { get; set; }
         /// <summary>
         /// 频繁变道报警分级速度阈值
         /// </summary>
+        [JsonProperty("laneChgAlarmLevelSpdLmt")]
         public byte HierarchicalSpeedThresholdFrequentChannelChangeAlarm { get; set; }
         /// <summary>
         /// 频繁变道报警前后视频录制时间
         /// </summary>
+        [JsonProperty("laneChgAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterFrequentLaneChangeAlarm { get; set; }
         /// <summary>
         /// 频繁变道报警拍照张数
         /// </summary>
+        [JsonProperty("laneChgAlarmPicCnt")]
         public byte FrequentChannelChangeAlarmPhotos { get; set; }
         /// <summary>
         /// 频繁变道报警拍照间隔
         /// </summary>
+        [JsonProperty("laneChgAlarmShotIntvl")]
         public byte FrequentLaneChangeAlarmInterval { get; set; }
         /// <summary>
         /// 车道偏离报警分级速度阈值
         /// </summary>
+        [JsonProperty("laneDeprAlarmLevelSpdLmt")]
         public byte GradedSpeedThresholdLaneDeviationAlarm { get; set; }
         /// <summary>
         /// 车道偏离报警前后视频录制时间
         /// </summary>
+        [JsonProperty("laneDeprAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterLaneDepartureAlarm { get; set; }
         /// <summary>
         /// 车道偏离报警拍照张数
         /// </summary>
+        [JsonProperty("laneDeprAlarmPicCnt")]
         public byte LaneDepartureAlarmPhoto { get; set; }
         /// <summary>
         /// 车道偏离报警拍照间隔
         /// </summary>
+        [JsonProperty("laneDeprAlarmShotIntvl")]
         public byte LaneDepartureAlarmPhotoInterval { get; set; }
         /// <summary>
         /// 前向碰撞报警时间阈值
         /// </summary>
+        [JsonProperty("crashAlarmDurLmt")]
         public byte ForwardCollisionWarningTimeThreshold { get; set; }
         /// <summary>
         /// 前向碰撞报警分级速度阈值
         /// </summary>
+        [JsonProperty("crashAlarmLevelSpdLimitl")]
         public byte HierarchicalSpeedThresholdForwardCollisionWarning { get; set; }
         /// <summary>
         /// 前向碰撞报警前后视频录制时间
         /// </summary>
+        [JsonProperty("crashAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterForwardCollisionAlarm { get; set; }
         /// <summary>
         /// 前向碰撞报警拍照张数
         /// </summary>
+        [JsonProperty("crashAlarmPicCnt")]
         public byte ForwardCollisionAlarmPhotographs { get; set; }
         /// <summary>
         /// 前向碰撞报警拍照间隔
         /// </summary>
+        [JsonProperty("crashAlarmShotIntvl")]
         public byte ForwardCollisionAlarmInterval { get; set; }
         /// <summary>
         /// 行人碰撞报警时间阈值
         /// </summary>
+        [JsonProperty("hitAlarmDurLmt")]
         public byte PedestrianCollisionAlarmTimeThreshold { get; set; }
         /// <summary>
         /// 行人碰撞报警使能速度阈值
         /// </summary>
+        [JsonProperty("hitAlarmEnableSpdLmt")]
         public byte PedestrianCollisionAlarmEnablingSpeedThreshold { get; set; }
         /// <summary>
         /// 行人碰撞报警前后视频录制时间
         /// </summary>
+        [JsonProperty("hitAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterPedestrianCollisionAlarm { get; set; }
         /// <summary>
         /// 行人碰撞报警拍照张数
         /// </summary>
+        [JsonProperty("hitAlarmPicCnt")]
         public byte PedestrianCollisionAlarmPhotos { get; set; }
         /// <summary>
         /// 行人碰撞报警拍照间隔
         /// </summary>
+        [JsonProperty("hitAlarmShotIntvl")]
         public byte PedestrianCollisionAlarmInterval { get; set; }
         /// <summary>
         /// 车距监控报警距离阈值
         /// </summary>
+        [JsonProperty("closeAlarmDistLmt")]
         public byte VehicleDistanceMonitoringAlarmDistanceThreshold { get; set; }
         /// <summary>
         /// 车距监控报警分级速度阈值
         /// </summary>
+        [JsonProperty("closeAlarmLevelSpdLmt")]
         public byte VehicleDistanceMonitoringAndAlarmClassificationSpeedThreshold { get; set; }
         /// <summary>
         /// 车距过近报警前后视频录制时间
         /// </summary>
+        [JsonProperty("closeAlarmVideoBnA")]
         public byte VideoRecordingTimeBeforeAndAfterAlarmVehicleProximity { get; set; }
         /// <summary>
         /// 车距过近报警拍照张数
         /// </summary>
+        [JsonProperty("closeAlarmPicCnt")]
         public byte AlarmPhotoVehicleCloseDistance { get; set; }
         /// <summary>
         /// 车距过近报警拍照间隔
         /// </summary>
+        [JsonProperty("closeAlarmShotIntvl")]
         public byte AlarmPhotoVehicleCloseDistanceInterval { get; set; }
         /// <summary>
         /// 道路标志识别拍照张数
         /// </summary>
+        [JsonProperty("roadSignPicCnt")]
         public byte RoadSignRecognitionPhotographs { get; set; }
         /// <summary>
         /// 道路标志识别拍照间隔
         /// </summary>
+        [JsonProperty("roadSignShotIntvl")]
         public byte RoadSignRecognitionPhotographsInterval { get; set; }
         /// <summary>
         /// 保留字段

@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// 位置汇报方案，0：根据 ACC 状态； 1：根据登录状态和 ACC 状态，先判断登录状态，若登录再根据 ACC 状态
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0021 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0021>, IJT808Analyze
     {
         /// <summary>
@@ -26,6 +28,7 @@ namespace JT808.Protocol.MessageBody
         /// 0：根据 ACC 状态； 
         /// 1：根据登录状态和 ACC 状态，先判断登录状态，若登录再根据 ACC 状态
         /// </summary>
+        [JsonProperty("gpsScheme")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// 位置汇报方案

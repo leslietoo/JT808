@@ -4,6 +4,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -16,6 +17,7 @@ namespace JT808.Protocol.MessageBody
     /// 0x0C，按累计距离上传，达到距离后自动停止上传；
     /// 0x0D，按累计条数上传，达到上传条数后自动停止上传。
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0094 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0094>, IJT808Analyze
     {
         /// <summary>
@@ -36,6 +38,7 @@ namespace JT808.Protocol.MessageBody
         /// 0x0C，按累计距离上传，达到距离后自动停止上传；
         /// 0x0D，按累计条数上传，达到上传条数后自动停止上传。
         /// </summary>
+        [JsonProperty("detailedGpsReport")]
         public byte ParamValue { get; set; }
         /// <summary>
         /// GNSS 模块详细定位数据上传方式

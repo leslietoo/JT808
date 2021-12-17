@@ -2,6 +2,7 @@
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessageBody;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -11,6 +12,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     /// 视频相关报警屏蔽字
     /// 0x8103_0x007A
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x007A : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x007A>, IJT808Analyze
     {
         /// <summary>
@@ -24,6 +26,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         /// <summary>
         /// 视频相关屏蔽报警字
         /// </summary>
+        [JsonProperty("alarmMask")]
         public uint AlarmShielding { get; set; }
         /// <summary>
         /// 视频相关报警屏蔽字
