@@ -10,7 +10,7 @@ namespace JT808.Protocol.MessageBody
     /// <summary>
     /// 终端通用应答
     /// </summary>
-    public class JT808_0x0001 : JT808Bodies,IJT808MessagePackFormatter<JT808_0x0001>, IJT808Analyze
+    public class JT808_0x0001 : JT808Bodies,IJT808MessagePackFormatter<JT808_0x0001>, IJT808Analyze, IJT808WithReplyMsgNum
     {
         /// <summary>
         /// 0x0001

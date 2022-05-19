@@ -1,6 +1,7 @@
 ﻿using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,39 +12,48 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     /// <summary>
     /// 终端上传音视频资源列表
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x1205_AVResouce:IJT808MessagePackFormatter<JT808_0x1205_AVResouce>, IJT808Analyze
     {
         /// <summary>
         /// 逻辑通道号
         /// </summary>
+        [JsonProperty("ch")]
         public byte LogicChannelNo { get; set; }
         /// <summary>
         /// 开始时间
         /// </summary>
+        [JsonProperty("begin")]
         public DateTime BeginTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>
+        [JsonProperty("end")]
         public DateTime EndTime { get; set; }
         /// <summary>
         /// 报警标志
         /// </summary>
+        [JsonProperty("alarmType")]
         public ulong AlarmFlag { get; set; }
         /// <summary>
         /// 音视频资源类型
         /// </summary>
+        [JsonProperty("resType")]
         public byte AVResourceType { get; set; }
         /// <summary>
         /// 码流类型
         /// </summary>
+        [JsonProperty("streamType")]
         public byte StreamType { get; set; }
         /// <summary>
         /// 存储器类型
         /// </summary>
+        [JsonProperty("storageType")]
         public byte MemoryType { get; set; }
         /// <summary>
         /// 文件大小
         /// </summary>
+        [JsonProperty("size")]
         public uint FileSize { get; set; }
         /// <summary>
         /// 

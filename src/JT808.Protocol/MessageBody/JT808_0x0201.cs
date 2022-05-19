@@ -10,7 +10,7 @@ namespace JT808.Protocol.MessageBody
     /// <summary>
     /// 位置信息查询应答
     /// </summary>
-    public class JT808_0x0201 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0201>, IJT808Analyze, IJT808GpsTime
+    public class JT808_0x0201 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0201>, IJT808Analyze, IJT808GpsTime, IJT808WithReplyMsgNum
     {
         /// <summary>
         /// 0x0201

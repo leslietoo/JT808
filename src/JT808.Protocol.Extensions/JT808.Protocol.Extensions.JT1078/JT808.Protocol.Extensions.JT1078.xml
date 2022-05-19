@@ -610,7 +610,7 @@
             
             </summary>
         </member>
-        <member name="P:JT808.Protocol.Extensions.JT1078.MessageBody.JT808_0x1205.MsgNum">
+        <member name="P:JT808.Protocol.Extensions.JT1078.MessageBody.JT808_0x1205.ReplyMsgNum">
             <summary>
             流水号
             </summary>
@@ -733,7 +733,7 @@
             
             </summary>
         </member>
-        <member name="P:JT808.Protocol.Extensions.JT1078.MessageBody.JT808_0x1206.MsgNum">
+        <member name="P:JT808.Protocol.Extensions.JT1078.MessageBody.JT808_0x1206.ReplyMsgNum">
             <summary>
             流水号
             </summary>

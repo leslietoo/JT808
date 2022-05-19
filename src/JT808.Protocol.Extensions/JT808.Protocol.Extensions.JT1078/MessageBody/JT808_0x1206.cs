@@ -11,7 +11,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
     /// <summary>
     /// 文件上传完成通知
     /// </summary>
-    public class JT808_0x1206 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x1206>, IJT808Analyze
+    public class JT808_0x1206 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x1206>, IJT808Analyze, IJT808WithReplyMsgNum
     {
         /// <summary>
         /// 
@@ -24,7 +24,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         /// <summary>
         /// 流水号
         /// </summary>
-        public ushort MsgNum { get; set; }
+        public ushort ReplyMsgNum { get; set; }
         /// <summary>
         /// 结果
         /// </summary>
@@ -38,8 +38,8 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         public void Analyze(ref JT808MessagePackReader reader, Utf8JsonWriter writer, IJT808Config config)
         {
             JT808_0x1206 value = new JT808_0x1206();
-            value.MsgNum = reader.ReadUInt16();
-            writer.WriteNumber($"[{value.MsgNum.ReadNumber()}]流水号", value.MsgNum);
+            value.ReplyMsgNum = reader.ReadUInt16();
+            writer.WriteNumber($"[{value.ReplyMsgNum.ReadNumber()}]流水号", value.ReplyMsgNum);
             value.Result = reader.ReadByte();
             writer.WriteString($"[{value.Result.ReadNumber()}]结果", ResultDisplay(value.Result));
             string ResultDisplay(byte Result) {
@@ -63,7 +63,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         public JT808_0x1206 Deserialize(ref JT808MessagePackReader reader, IJT808Config config)
         {
             JT808_0x1206 jT808_0x1206 = new JT808_0x1206();
-            jT808_0x1206.MsgNum = reader.ReadUInt16();
+            jT808_0x1206.ReplyMsgNum = reader.ReadUInt16();
             jT808_0x1206.Result = reader.ReadByte();
             return jT808_0x1206;
         }
@@ -75,7 +75,7 @@ namespace JT808.Protocol.Extensions.JT1078.MessageBody
         /// <param name="config"></param>
         public void Serialize(ref JT808MessagePackWriter writer, JT808_0x1206 value, IJT808Config config)
         {
-            writer.WriteUInt16(value.MsgNum);
+            writer.WriteUInt16(value.ReplyMsgNum);
             writer.WriteByte(value.Result);
         }
     }

@@ -12,7 +12,7 @@ namespace JT808.Protocol.MessageBody
     /// 行驶记录仪数据上传
     /// 0x0700
     /// </summary>
-    public class JT808_0x0700 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0700>, IJT808Analyze
+    public class JT808_0x0700 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0700>, IJT808Analyze, IJT808WithReplyMsgNum
     {
         /// <summary>
         /// 0x0700

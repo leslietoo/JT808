@@ -11,7 +11,7 @@ namespace JT808.Protocol.MessageBody
     /// 摄像头立即拍摄命令应答
     /// 0x0805
     /// </summary>
-    public class JT808_0x0805 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0805>, IJT808Analyze, IJT808_2019_Version
+    public class JT808_0x0805 : JT808Bodies, IJT808MessagePackFormatter<JT808_0x0805>, IJT808Analyze, IJT808_2019_Version, IJT808WithReplyMsgNum
     {
         /// <summary>
         /// 0x0805
