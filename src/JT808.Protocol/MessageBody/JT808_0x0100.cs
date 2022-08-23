@@ -92,7 +92,8 @@ namespace JT808.Protocol.MessageBody
             }
             else if (reader.Version == JT808Version.JTT2013)
             {
-                if (reader.ReadCurrentRemainContentLength() > 33)
+                var remainLen = reader.ReadCurrentRemainContentLength();
+                if (remainLen >= 33) // 吴注：最后一个字段车牌号为空时就恰恰是33个字节，这种情况也归于2013版本，海康G40就是如此。
                 {
                     jT808_0X0100.MakerId = reader.ReadString(5);
                     jT808_0X0100.TerminalModel = reader.ReadString(20);
@@ -166,7 +167,7 @@ namespace JT808.Protocol.MessageBody
             else if (reader.Version == JT808Version.JTT2013)
             {
                 var length = reader.ReadCurrentRemainContentLength();
-                if (length > 33)
+                if (length >= 33) // 吴注：最后一个字段车牌号为空时就恰恰是33个字节，这种情况也归于2013版本，海康G40就是如此。
                 {
                     ReadOnlySpan<byte> midSpan = reader.ReadVirtualArray(5);
                     jT808_0X0100.MakerId = reader.ReadString(5);
