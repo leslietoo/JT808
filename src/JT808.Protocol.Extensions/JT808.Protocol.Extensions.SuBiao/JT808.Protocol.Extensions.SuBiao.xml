@@ -2064,5 +2064,66 @@
             客户代码
             </summary>
         </member>
+        <member name="T:JT808.Protocol.Extensions.JT808PackageExtensions">
+            <summary>
+            JT808创建包扩展
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create``1(JT808.Protocol.Extensions.SuBiao.Enums.JT808_SuBiao_MsgId,System.String,``0)">
+            <summary>
+            根据消息Id创建包
+            </summary>
+            <typeparam name="TJT808Bodies"></typeparam>
+            <param name="msgId"></param>
+            <param name="terminalPhoneNo"></param>
+            <param name="bodies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create(JT808.Protocol.Extensions.SuBiao.Enums.JT808_SuBiao_MsgId,System.String)">
+            <summary>
+            根据消息Id创建包
+            </summary>
+            <param name="msgId"></param>
+            <param name="terminalPhoneNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019``1(JT808.Protocol.Extensions.SuBiao.Enums.JT808_SuBiao_MsgId,System.String,``0)">
+            <summary>
+            根据消息Id创建2019版本包
+            </summary>
+            <typeparam name="TJT808Bodies"></typeparam>
+            <param name="msgId"></param>
+            <param name="terminalPhoneNo"></param>
+            <param name="bodies"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019(JT808.Protocol.Extensions.SuBiao.Enums.JT808_SuBiao_MsgId,System.String)">
+            <summary>
+            根据消息Id创建2019版本包
+            </summary>
+            <param name="msgId"></param>
+            <param name="terminalPhoneNo"></param>
+            <returns></returns>
+        </member>
+        <member name="T:JT808.Protocol.MessageBody.JT808_0x12F0">
+            <summary>
+            苏标的报警附件的数据报文并没有包装在指令内，没有消息ID，这里伪造一个
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0x12F0.SkipSerialization">
+            <summary>
+            跳过数据体序列化
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0x12F0.MsgId">
+            <summary>
+            0x12F0
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0x12F0.Description">
+            <summary>
+            终端心跳
+            </summary>
+        </member>
     </members>
 </doc>
