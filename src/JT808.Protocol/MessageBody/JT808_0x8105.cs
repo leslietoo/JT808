@@ -152,6 +152,8 @@ namespace JT808.Protocol.MessageBody
                         }
                     }
                 }
+                /*
+                 * commented by Wu Xuehui
                 else
                 {
                     for (int i = 0; i < CommandParameterCount; i++)
@@ -159,6 +161,8 @@ namespace JT808.Protocol.MessageBody
                         writer.WriteChar(CommandParameterSeparator);
                     }
                 }
+                */
+
                 if (value.CustomCommandParameters != null && value.CustomCommandParameters.Count > 0)
                 {
                     //自定义命令参数扩展
@@ -181,7 +185,7 @@ namespace JT808.Protocol.MessageBody
                 switch (value.CommandWord)
                 {
                     case 1:
-                        writer.WriteString(UpdateFirmwareCommand);
+                        writer.WriteString(value.UpdateFirmwareCommand);
                         break;
                     default:
                         break;
