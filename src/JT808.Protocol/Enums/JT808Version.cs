@@ -10,6 +10,11 @@ namespace JT808.Protocol.Enums
     public enum JT808Version:byte
     {
         /// <summary>
+        /// Added by Wuxuehui
+        /// </summary>
+        Unknown = 0xff,
+
+        /// <summary>
         /// 2011
         /// </summary>
         JTT2011 = 0,

@@ -4,12 +4,14 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
     /// <summary>
     /// CAN 总线通道 1 采集时间间隔(ms)，0 表示不采集
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0100 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0100>, IJT808Analyze
     {
         /// <summary>
@@ -23,6 +25,7 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// CAN 总线通道 1 采集时间间隔(ms)，0 表示不采集
         /// </summary>
+        [JsonProperty("sampleIntvl")]
         public uint ParamValue { get; set; }
         /// <summary>
         /// CAN 总线通道 1 采集时间间隔

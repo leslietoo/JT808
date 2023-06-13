@@ -1693,6 +1693,11 @@
             JT808版本号
             </summary>
         </member>
+        <member name="F:JT808.Protocol.Enums.JT808Version.Unknown">
+            <summary>
+            Added by Wuxuehui
+            </summary>
+        </member>
         <member name="F:JT808.Protocol.Enums.JT808Version.JTT2011">
             <summary>
             2011

@@ -6,6 +6,7 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Newtonsoft.Json;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -17,6 +18,7 @@ namespace JT808.Protocol.MessageBody
     /// bit29 表示数据采集方式，0：原始数据，1：采集区间的计算值；
     /// bit28-bit0 表示 CAN 总线 ID。
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class JT808_0x8103_0x0110 : JT808_0x8103_BodyBase, IJT808MessagePackFormatter<JT808_0x8103_0x0110>, IJT808Analyze
     {
         /// <summary>
@@ -31,22 +33,27 @@ namespace JT808.Protocol.MessageBody
         /// <summary>
         /// bit63-bit32 表示此 ID 采集时间间隔(ms)，0 表示不采集；
         /// </summary>
+        [JsonProperty("sampleIntvl")]
         public uint CollectTimeInterval { get; set; }
         /// <summary>
         /// bit31 表示 CAN 通道号，0：CAN1，1：CAN2；
         /// </summary>
+        [JsonProperty("chNo")]
         public byte ChannelNo { get; set; }
         /// <summary>
         /// bit30 表示帧类型，0：标准帧，1：扩展帧；
         /// </summary>
+        [JsonProperty("frameType")]
         public byte FrameType { get; set; }
         /// <summary>
         ///  bit29 表示数据采集方式，0：原始数据，1：采集区间的计算值；
         /// </summary>
+        [JsonProperty("sampleMode")]
         public byte CollectWay { get; set; }
         /// <summary>
         /// bit28-bit0 表示 CAN 总线 ID。
         /// </summary>
+        [JsonProperty("CANBusId")]
         public long BusId { get; set; }
         /// <summary>
         /// CAN总线ID单独采集设置
