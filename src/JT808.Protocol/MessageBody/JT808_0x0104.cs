@@ -53,7 +53,20 @@ namespace JT808.Protocol.MessageBody
                 {
                     if (jT808_0x0104.ParamList != null)
                     {
-                        jT808_0x0104.ParamList.Add(JT808MessagePackFormatterResolverExtensions.JT808DynamicDeserialize(instance, ref reader, config));
+                        // IList<dynamic> cannot call a method "Add" without casting
+                        // IList<dynamic> cannot call a method "Add", although IList<T> is inherited from ICollection<T>, where an Add - Method exists.The Error is unexpected.
+                        //
+                        // List<dynamic> list1 = new List<dynamic>(); dynamic d1 = 1; list1.Add(d1); // is ok
+                        // IList<dynamic> list2 = new List<dynamic>(); dynamic d2 = 1; list2.Add(d2); // Error:
+                        // 'System.Collections.Generic.IList<object>' does not contain a definition for 'Add'
+                        //
+                        // Workarounds are for example:
+                        // list2.Add((object)d2); // or
+                        // ((ICollection<dynamic>)list2).Add(d2); // or
+                        // ((List<dynamic>)list2).Add(d2);
+                        // 
+                        // Add()的参数必须转型，否则抛异常：'System.Collections.Generic.IList<JT808.Protocol.MessageBody.JT808_0x8103_BodyBase>' does not contain a definition for 'Add'
+                        jT808_0x0104.ParamList.Add((JT808_0x8103_BodyBase)JT808MessagePackFormatterResolverExtensions.JT808DynamicDeserialize(instance, ref reader, config));
                     }
                     else
                     {
