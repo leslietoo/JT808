@@ -4159,6 +4159,16 @@
             <param name="writer"></param>
             <param name="config"></param>
         </member>
+        <member name="T:JT808.Protocol.Interfaces.IJT808CANBusTime">
+            <summary>
+            带有CANBus接收时间的808指令必须实现此接口
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.Interfaces.IJT808CANBusTime.CANBusTime">
+            <summary>
+            CANBus接收时间（设备本地时间）
+            </summary>
+        </member>
         <member name="T:JT808.Protocol.Interfaces.IJT808Compress">
             <summary>
             压缩接口
@@ -4206,7 +4216,7 @@
         </member>
         <member name="P:JT808.Protocol.Interfaces.IJT808GpsTime.GPSTime">
             <summary>
-            实时GPS时间
+            实时GPS时间（设备本地时间）
             </summary>
         </member>
         <member name="T:JT808.Protocol.Interfaces.IJT808MsgIdFactory">

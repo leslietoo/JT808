@@ -77,7 +77,7 @@ namespace JT808.Protocol.MessageBody
             jT808_0x8103_0x0110.ChannelNo = (byte)((temp >> 31) & 0x01);
             jT808_0x8103_0x0110.FrameType = (byte)((temp >> 30) & 0x01);
             jT808_0x8103_0x0110.CollectWay = (byte)((temp >> 29) & 0x01);
-            jT808_0x8103_0x0110.BusId = temp & 0x01FFFFFF;
+            jT808_0x8103_0x0110.BusId = temp & 0x01FFFFFFF;
             writer.WriteNumber($"[{jT808_0x8103_0x0110.ParamId.ReadNumber()}]参数ID", jT808_0x8103_0x0110.ParamId);
             writer.WriteNumber($"[{jT808_0x8103_0x0110.ParamLength.ReadNumber()}]参数长度", jT808_0x8103_0x0110.ParamLength);
             writer.WriteStartObject($"CAN总线ID单独采集设置");
@@ -104,7 +104,7 @@ namespace JT808.Protocol.MessageBody
             jT808_0x8103_0x0110.ChannelNo =(byte)( (temp >> 31) & 0x01);
             jT808_0x8103_0x0110.FrameType = (byte)((temp >> 30) & 0x01);
             jT808_0x8103_0x0110.CollectWay = (byte)((temp >> 29) & 0x01);
-            jT808_0x8103_0x0110.BusId = temp & 0x01FFFFFF;
+            jT808_0x8103_0x0110.BusId = temp & 0x01FFFFFFF;
             return jT808_0x8103_0x0110;
         }
         /// <summary>
@@ -118,7 +118,7 @@ namespace JT808.Protocol.MessageBody
             writer.WriteUInt32(value.ParamId);
             writer.WriteByte(value.ParamLength);
             writer.WriteUInt32(value.CollectTimeInterval);
-            var temp = (uint)(value.ChannelNo << 31 | value.FrameType << 30 | value.CollectWay << 29 | (int)(value.BusId& 0x01FFFFFF));
+            var temp = (uint)(value.ChannelNo << 31 | value.FrameType << 30 | value.CollectWay << 29 | (int)(value.BusId& 0x01FFFFFFF));
             writer.WriteUInt32(temp);
         }
     }

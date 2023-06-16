@@ -514,9 +514,9 @@ namespace JT808.Protocol.MessagePack
                 var readOnlySpan = GetReadOnlySpan(5);
                 var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
                 d = new DateTime(
-                DateTime.Now.Year,
-                DateTime.Now.Month,
-                DateTime.Now.Day,
+                DateTime.MinValue.Year,
+                DateTime.MinValue.Month,
+                DateTime.MinValue.Day,
                 BcdToInt(readOnlySpan[0]),
                 BcdToInt(readOnlySpan[1]),
                 BcdToInt(readOnlySpan[2]), fff);
@@ -544,9 +544,9 @@ namespace JT808.Protocol.MessagePack
                 var fff = BcdToInt(readOnlySpan[3]) * 100 + BcdToInt(readOnlySpan[4]);
                 if (hour == 0 && minute == 0 && second == 0 && fff == 0) return null;
                 d = new DateTime(
-                DateTime.Now.Year,
-                DateTime.Now.Month,
-                DateTime.Now.Day,
+                DateTime.MinValue.Year,
+                DateTime.MinValue.Month,
+                DateTime.MinValue.Day,
                 hour,
                 minute,
                 second,
