@@ -1074,6 +1074,12 @@
             0x0705
             </summary>
         </member>
+        <member name="F:JT808.Protocol.Enums.JT808MsgId.CAN总线数据下发">
+            <summary>
+            CAN总线数据下发
+            0xF800
+            </summary>
+        </member>
         <member name="F:JT808.Protocol.Enums.JT808MsgId.多媒体事件信息上传">
             <summary>
             多媒体事件信息上传
@@ -2655,6 +2661,30 @@
         <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0x0705)">
             <summary>
             0x0705 - CAN总线数据上传
+            auto-generated 2019 version
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create_CAN总线数据下发(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF800)">
+            <summary>
+            0xF800 - CAN总线数据下发
+            auto-generated
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF800)">
+            <summary>
+            0xF800 - CAN总线数据下发
+            auto-generated
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create_CAN总线数据下发_2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF800)">
+            <summary>
+            0xF800 - CAN总线数据下发
+            auto-generated 2019 version
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF800)">
+            <summary>
+            0xF800 - CAN总线数据下发
             auto-generated 2019 version
             </summary>
         </member>
@@ -10803,6 +10833,13 @@
             <param name="config"></param>
             <returns></returns>
         </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0x0705.ParseCANData(System.Byte[])">
+            <summary>
+            解析CAN数据为可读的文本
+            </summary>
+            <param name="data"></param>
+            <returns>可读文本</returns>
+        </member>
         <member name="M:JT808.Protocol.MessageBody.JT808_0x0705.Serialize(JT808.Protocol.MessagePack.JT808MessagePackWriter@,JT808.Protocol.MessageBody.JT808_0x0705,JT808.Protocol.IJT808Config)">
             <summary>
             
@@ -18556,6 +18593,59 @@
             <param name="writer"></param>
             <param name="config"></param>
         </member>
+        <member name="T:JT808.Protocol.MessageBody.JT808_0xF800">
+            <summary>
+            CAN总线数据下发
+            808规定0xF000~0xFFFF为厂商自定义下行消息
+            数据格式基本跟CAN上传协议0x0705一致
+            </summary>
+            <remarks>Added by WuXuehui</remarks>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF800.MsgId">
+            <summary>
+            0xF800
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF800.Description">
+            <summary>
+            CAN总线数据上传
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF800.CanItemCount">
+            <summary>
+            数据项个数
+            包含的 CAN 总线数据项个数，>0
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF800.CanItems">
+            <summary>
+            CAN 总线数据项
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF800.Analyze(JT808.Protocol.MessagePack.JT808MessagePackReader@,System.Text.Json.Utf8JsonWriter,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="writer"></param>
+            <param name="config"></param>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF800.Deserialize(JT808.Protocol.MessagePack.JT808MessagePackReader@,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="config"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF800.Serialize(JT808.Protocol.MessagePack.JT808MessagePackWriter@,JT808.Protocol.MessageBody.JT808_0xF800,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="config"></param>
+        </member>
         <member name="T:JT808.Protocol.MessagePack.JT808MessagePackReader">
             <summary>
             JT808消息读取器
@@ -19383,6 +19473,27 @@
             CAN 数据
             8
             </summary>
+        </member>
+        <member name="P:JT808.Protocol.Metadata.JT808CanProperty.MsgGroup">
+            <summary>
+            消息Group
+            序列化时忽略此字段
+            </summary>
+            <remarks>Added By WuXuehui</remarks>
+        </member>
+        <member name="P:JT808.Protocol.Metadata.JT808CanProperty.MsgId">
+            <summary>
+            消息ID
+            序列化时忽略此字段
+            </summary>
+            <remarks>Added By WuXuehui</remarks>
+        </member>
+        <member name="P:JT808.Protocol.Metadata.JT808CanProperty.Text">
+            <summary>
+            CAN数据的含义。解析失败时为空
+            序列化时忽略此字段
+            </summary>
+            <remarks>Added By WuXuehui</remarks>
         </member>
         <member name="T:JT808.Protocol.Metadata.JT808CircleAreaProperty">
             <summary>

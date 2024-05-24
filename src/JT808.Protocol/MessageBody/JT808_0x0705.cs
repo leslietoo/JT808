@@ -6,7 +6,9 @@ using JT808.Protocol.MessagePack;
 using JT808.Protocol.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
+using System.Buffers.Binary;
 
 namespace JT808.Protocol.MessageBody
 {
@@ -90,10 +92,125 @@ namespace JT808.Protocol.MessageBody
                 {
                     throw new JT808Exception(Enums.JT808ErrorCode.NotEnoughLength, $"{nameof(jT808CanProperty.CanData)}->8");
                 }
+
+                jT808CanProperty.MsgGroup = jT808CanProperty.CanData[0];
+                jT808CanProperty.MsgId = jT808CanProperty.CanData[1];
+                jT808CanProperty.Text = ParseCANData(jT808CanProperty.CanData);
+
                 value.CanItems.Add(jT808CanProperty);
             }
             return value;
         }
+
+        /// <summary>
+        /// 解析CAN数据为可读的文本
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>可读文本</returns>
+        string ParseCANData(byte[] data)
+        {
+            Debug.Assert(data.Length == 8);
+
+            switch (data[0])
+            {
+                case 0x01:
+                    switch (data[1])
+                    {
+                        case 0x06:
+                            var byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            return $"VEHICLE PARKING BRAKE OFF, VEHICLE SCAN IN {byte2_3} SECONDS; BATTERY: {data[7] / 10.0: F1} VOLT";
+                        default:
+                            break;
+                    }
+
+                    break;
+                case 0x03:
+                    switch (data[1])
+                    {
+                        // This messages is sent from LiDAS to the MDVR if LiDAS has been activated and prepares for the evacuation drill monitoring.
+                        // The voltage of the main vehicle battery(12.9V) is transmitted as a single byte and calculated by dividing the value(129, dec) by 10.
+                        case 0x03:
+                            return $"DRIVER STARTED EVACUATION DRILL; BATTERY: {data[7] / 10.0 : F1} VOLT";
+
+                        case 0x06:
+                            var byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            return $"DRIVER BUTTON PRESSED, VEHICLE SCAN IN {byte2_3} SECONDS; BATTERY: {data[7] / 10.0: F1} VOLT";
+                        default:
+                            break;
+                    }
+
+                    break;
+                case 0x04:
+                    switch (data[1])
+                    {
+                        // This messages is sent from LiDAS to the MDVR if LiDAS has been activated
+                        // and has started to check the vehicle for children left in the vehicle.
+                        // The vehicle scan will have a duration of 60 seconds and the qualifier to
+                        // decide whether the vehicle is empty or not is 15 seconds.
+                        // The voltage of the main vehicle battery(13.1V) is transmitted as a single byte and calculated by dividing the value(131, dec) by 10.
+                        case 0x01:
+                            var byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            var byte4 = Convert.ToString(data[4], 2).PadLeft(8, '0');
+                            var byte5 = Convert.ToString(data[5], 2).PadLeft(8, '0');
+                            return $"VEHICLE SCAN INITIATED, SCAN DURATION {byte2_3} SECONDS, QUALIFIER {data[6]}, ENAB: {byte4} - {byte5}; BATTERY: {data[7] / 10.0: F1} VOLT";
+
+                        case 0x02:
+                            byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            byte4 = Convert.ToString(data[4], 2).PadLeft(8, '0');
+                            byte5 = Convert.ToString(data[5], 2).PadLeft(8, '0');
+                            var byte6 = Convert.ToString(data[6], 2).PadLeft(8, '0');
+                            var byte7 = Convert.ToString(data[7], 2).PadLeft(8, '0');
+                            return $"SCAN COMPLETED, NO CHILD DETECTED, SCAN DURATION {byte2_3} SECONDS, RESP:{byte4}-{byte5}, DETD:{byte6}-{byte7}";
+
+                        // This messages is sent from LiDAS to the MDVR after the completion of a LiDAS scan and a child has been detected.
+                        // Byte 5 and 6 show the sensors responding to the CCU.
+                        // Byte 7 and 8 show the sensors which detected a child
+                        case 0x03:
+                            byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            byte4 = Convert.ToString(data[4], 2).PadLeft(8, '0');
+                            byte5 = Convert.ToString(data[5], 2).PadLeft(8, '0');
+                            byte6 = Convert.ToString(data[6], 2).PadLeft(8, '0');
+                            byte7 = Convert.ToString(data[7], 2).PadLeft(8, '0');
+                            return $"SCAN COMPLETED, CHILD DETECTED, SCAN DURATION {byte2_3} SECONDS, RESP:{byte4}-{byte5}, DETD:{byte6}-{byte7}";
+
+                        // This messages is sent from LiDAS to the MDVR if LiDAS has completed the evacuation drill monitoring
+                        // The voltage of the main vehicle battery(12.9V) is transmitted as a single byte and calculated by dividing the value(129, dec) by 10.
+                        case 0x04:
+                            return $"EVACUATION DRILL COMPLETED IN TIME; BATTERY: {data[7] / 10.0: F1} VOLT";
+
+                        case 0x05:
+                            return $"EVACUATION DRILL FAILED; BATTERY: {data[7] / 10.0: F1} VOLT";
+                        default:
+                            break;
+                    }
+
+                    break;
+                case 0x07:
+                    switch (data[1])
+                    {
+                        case 0x01:
+                            var byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            return $"CHILD DETECTED, DRIVER AND FLEET MANAGER INFORMED, NEXT SMS IN {byte2_3} MINUTES; BATTERY: {data[7] / 10.0: F1} VOLT";
+
+                        case 0x02:
+                            byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            return $"CHILD DETECTED, NO RESPONSE FROM DRIVER OR FLEET MANAGER, NEXT SMS IN {byte2_3} MINUTES; BATTERY: {data[7] / 10.0: F1} VOLT";
+
+                        case 0x11:
+                            byte2_3 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(2, 2));
+                            return $"LOCAL LiDAS BUTTON PRESSED, VEHICLE RE-SCAN in {byte2_3} MINUTES; BATTERY: {data[7] / 10.0: F1} VOLT";
+                        default:
+                            break;
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -258,6 +258,11 @@ namespace JT808.Protocol.Enums
         /// </summary>
         CAN总线数据上传 = 0x0705,
         /// <summary>
+        /// CAN总线数据下发
+        /// 0xF800
+        /// </summary>
+        CAN总线数据下发 = 0xF800,
+        /// <summary>
         /// 多媒体事件信息上传
         /// 0x0800
         /// </summary>
