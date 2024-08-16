@@ -196,7 +196,7 @@ namespace JT808.Protocol.MessageBody
                             return $"EVACUATION DRILL FAILED; BATTERY: {data[7] * 0.1:F1} VOLT";
 
                         case 0x06:
-                            var byte6_7 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(6, 7));
+                            var byte6_7 = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(6, 2));
                             return $"DRIVER DID NOT START EVACDRILL IN {byte6_7} SECONDS";
 
                         default:
