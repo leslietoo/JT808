@@ -1,0 +1,81 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="netstandard" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System" #>
+<#@ assembly name="$(TargetPath)" #>
+<#@ import namespace="Scanner.Protocol" #>
+<#@ import namespace="Scanner.Protocol.Enums" #>
+<#@ import namespace="Scanner.Protocol.Extensions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection" #>
+<#@ output extension=".cs" #>
+<#
+    // To generate .cs from TT file:
+    //   Build Menu -> "Transform All T4 Templates", or
+	//   Context menu of specific TT file -> "Run Custom Tool"
+	// Set Both "Platform"" and "Platform target" to "Any CPU" to avoid the BadImageFormatException.
+
+	var types=Assembly.GetAssembly(typeof(ScannerPackage)).GetTypes().Where(w => w.BaseType == typeof(ScannerBodies)).ToList();
+#>
+using Scanner.Protocol.Enums;
+
+namespace Scanner.Protocol.Extensions
+{
+    /// <summary>
+    /// todo:source-generators正式发布以后将T4模板换掉
+    /// https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/
+    /// </summary>
+	public static partial class ScannerPackageExtensions
+	{
+<#
+	foreach (var type in types)
+    {
+		 var instance = Activator.CreateInstance(type);
+		 if(instance is ScannerBodies scannerBodies)
+         {
+            string code = $"0x{scannerBodies.MsgId.ToString("X2").PadLeft(4, '0')}";
+            string name = scannerBodies.Description;
+#>
+			/// <summary>
+			/// <#= code #> - <#= name #>
+			/// auto-generated
+			/// </summary>
+			public static ScannerPackage Create_<#= name #>(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			{
+				return Create<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+			}
+
+			/// <summary>
+			/// <#= code #> - <#= name #>
+			/// auto-generated
+			/// </summary>
+			public static ScannerPackage Create(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			{
+				return Create<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+			}
+
+			/// <summary>
+			/// <#= code #> - <#= name #>
+			/// auto-generated 2019 version
+			/// </summary>
+			public static ScannerPackage Create_<#= name #>_2019(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			{
+				return Create2019<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+			}
+
+			/// <summary>
+			/// <#= code #> - <#= name #>
+			/// auto-generated 2019 version
+			/// </summary>
+			public static ScannerPackage Create2019(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			{
+				return Create2019<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+			}
+<#
+		}
+    }
+#>
+	}
+}
