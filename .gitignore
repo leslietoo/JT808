@@ -329,3 +329,5 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 /nupkgs
+src/BusCardScanner.Protocol/BusCardScanner.Protocol.sln
+src/BusCardScanner.Protocol/BusCardScanner.Protocol.xml
