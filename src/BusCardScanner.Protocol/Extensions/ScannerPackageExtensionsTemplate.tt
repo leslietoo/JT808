@@ -35,7 +35,7 @@ namespace Scanner.Protocol.Extensions
 		 var instance = Activator.CreateInstance(type);
 		 if(instance is ScannerBodies scannerBodies)
          {
-            string code = $"0x{scannerBodies.MsgId.ToString("X2").PadLeft(4, '0')}";
+            string code = $"0x{scannerBodies.MsgId.ToString("X2").PadLeft(2, '0')}";
             string name = scannerBodies.Description;
 #>
 			/// <summary>
@@ -54,24 +54,6 @@ namespace Scanner.Protocol.Extensions
 			public static ScannerPackage Create(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
 			{
 				return Create<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
-			}
-
-			/// <summary>
-			/// <#= code #> - <#= name #>
-			/// auto-generated 2019 version
-			/// </summary>
-			public static ScannerPackage Create_<#= name #>_2019(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
-			{
-				return Create2019<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
-			}
-
-			/// <summary>
-			/// <#= code #> - <#= name #>
-			/// auto-generated 2019 version
-			/// </summary>
-			public static ScannerPackage Create2019(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
-			{
-				return Create2019<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
 			}
 <#
 		}

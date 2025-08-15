@@ -1,4 +1,6 @@
-﻿namespace Scanner.Protocol.Enums
+﻿using System.ComponentModel;
+
+namespace Scanner.Protocol.Enums
 {
     /// <summary>
     /// 返回结果
@@ -8,22 +10,22 @@
         /// <summary>
         /// 成功/确认
         /// </summary>
-        成功 = 0x00,
+        [Description("succeed")]
+        Succeed = 0x00,
         /// <summary>
         /// 失败
         /// </summary>
-        失败 = 0x01,
+        [Description("failed")]
+        Fail = 0x01,
         /// <summary>
         /// 消息有误
         /// </summary>
-        消息有误 = 0x02,
+        [Description("message error")]
+        MessageError = 0x02,
         /// <summary>
         /// 不支持
         /// </summary>
-        不支持 = 0x03,
-        /// <summary>
-        /// 报警处理确认
-        /// </summary>
-        报警处理确认 = 0x04
+        [Description("not supported")]
+        NotSupport = 0x03,
     }
 }

@@ -11,7 +11,7 @@ namespace Scanner.Protocol.Enums
         /// 成功/确认
         /// </summary>
         [Description("succeed")]
-        Success = 0x00,
+        Succeed = 0x00,
 
         /// <summary>
         /// 失败
