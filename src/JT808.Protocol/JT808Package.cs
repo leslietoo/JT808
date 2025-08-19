@@ -4,7 +4,9 @@ using JT808.Protocol.Extensions;
 using JT808.Protocol.Formatters;
 using JT808.Protocol.Interfaces;
 using JT808.Protocol.MessagePack;
+using Scanner.Protocol;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace JT808.Protocol
@@ -94,6 +96,15 @@ namespace JT808.Protocol
         /// </summary>
         public string SchoolName { get; set; }
 
+        /// <summary>
+        /// JT808透传指令携带的读卡器协议指令，非透传指令该字段为null
+        /// </summary>
+        public List<ScannerPackage> ValidScannerInstrs { get; set; }
+
+        /// <summary>
+        /// JT808透传指令携带的解析失败的读卡器协议指令，非透传指令该字段为null
+        /// </summary>
+        public List<InvalidScannerPackage> InvalidScannerInstrs { get; set; }
         //////////////////////////////////////////////////////////////////////////
 
         /// <summary>

@@ -5967,6 +5967,16 @@
             设备所属的学校名
             </summary>
         </member>
+        <member name="P:JT808.Protocol.JT808Package.ValidScannerInstrs">
+            <summary>
+            JT808透传指令携带的读卡器协议指令，非透传指令该字段为null
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.JT808Package.InvalidScannerInstrs">
+            <summary>
+            JT808透传指令携带的解析失败的读卡器协议指令，非透传指令该字段为null
+            </summary>
+        </member>
         <member name="M:JT808.Protocol.JT808Package.Deserialize(JT808.Protocol.MessagePack.JT808MessagePackReader@,JT808.Protocol.IJT808Config)">
             <summary>
             
