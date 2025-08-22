@@ -42,18 +42,18 @@ namespace Scanner.Protocol.Extensions
 			/// <#= code #> - <#= name #>
 			/// auto-generated
 			/// </summary>
-			public static ScannerPackage Create_<#= name #>(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			public static ScannerPackage Create_<#= name #>(this ScannerMsgId msgId, string scannerId, <#= type.FullName #> bodies)
 			{
-				return Create<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+				return Create<<#= type.FullName#>>(msgId, scannerId, bodies);
 			}
 
 			/// <summary>
 			/// <#= code #> - <#= name #>
 			/// auto-generated
 			/// </summary>
-			public static ScannerPackage Create(this ScannerMsgId msgId, string terminalPhoneNo, <#= type.FullName #> bodies)
+			public static ScannerPackage Create(this ScannerMsgId msgId, string scannerId, <#= type.FullName #> bodies)
 			{
-				return Create<<#= type.FullName#>>(msgId, terminalPhoneNo, bodies);
+				return Create<<#= type.FullName#>>(msgId, scannerId, bodies);
 			}
 <#
 		}
