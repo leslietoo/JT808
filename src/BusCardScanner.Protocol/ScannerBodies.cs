@@ -21,5 +21,10 @@ namespace Scanner.Protocol
         /// 消息描述
         /// </summary>
         public abstract string Description { get; }
+
+        /// <summary>
+        /// 读卡器ID
+        /// </summary>
+        public virtual string ScannerId { get; set; } = ScannerConstants.EmptyScannerId;
     }
 }

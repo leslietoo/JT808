@@ -93,6 +93,7 @@ namespace Scanner.Protocol
                         //4.2.处理消息体
                         scannerPackage.Bodies = ScannerMessagePackFormatterResolverExtensions.ScannerDynamicDeserialize(
                             instance, ref reader, config);
+                        scannerPackage.Bodies.ScannerId = scannerPackage.Header.ScannerId;
                     }
                     catch (Exception ex)
                     {
