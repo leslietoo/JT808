@@ -813,6 +813,43 @@ namespace JT808.Protocol.Extensions
         {
             return Create2019<JT808.Protocol.MessageBody.JT808_0xF800>(msgId, terminalPhoneNo, bodies);
         }
+
+        /// <summary>
+        /// 0xF900 - 读卡器指令上传
+        /// auto-generated
+        /// </summary>
+        public static JT808Package Create_读卡器指令上传(this JT808MsgId msgId, string terminalPhoneNo, JT808.Protocol.MessageBody.JT808_0xF900 bodies)
+        {
+            return Create<JT808.Protocol.MessageBody.JT808_0xF900>(msgId, terminalPhoneNo, bodies);
+        }
+
+        /// <summary>
+        /// 0xF900 - 读卡器指令上传
+        /// auto-generated
+        /// </summary>
+        public static JT808Package Create(this JT808MsgId msgId, string terminalPhoneNo, JT808.Protocol.MessageBody.JT808_0xF900 bodies)
+        {
+            return Create<JT808.Protocol.MessageBody.JT808_0xF900>(msgId, terminalPhoneNo, bodies);
+        }
+
+        /// <summary>
+        /// 0xF900 - 读卡器指令上传
+        /// auto-generated 2019 version
+        /// </summary>
+        public static JT808Package Create_读卡器指令上传_2019(this JT808MsgId msgId, string terminalPhoneNo, JT808.Protocol.MessageBody.JT808_0xF900 bodies)
+        {
+            return Create2019<JT808.Protocol.MessageBody.JT808_0xF900>(msgId, terminalPhoneNo, bodies);
+        }
+
+        /// <summary>
+        /// 0xF900 - 读卡器指令上传
+        /// auto-generated 2019 version
+        /// </summary>
+        public static JT808Package Create2019(this JT808MsgId msgId, string terminalPhoneNo, JT808.Protocol.MessageBody.JT808_0xF900 bodies)
+        {
+            return Create2019<JT808.Protocol.MessageBody.JT808_0xF900>(msgId, terminalPhoneNo, bodies);
+        }
+
         /// <summary>
         /// 0x0800 - 多媒体事件信息上传
         /// auto-generated

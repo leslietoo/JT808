@@ -1206,6 +1206,12 @@
              0x0802
             </summary>
         </member>
+        <member name="F:JT808.Protocol.Enums.JT808MsgId.读卡器指令上传">
+            <summary>
+            读卡器指令上传
+            0xF900
+            </summary>
+        </member>
         <member name="T:JT808.Protocol.Enums.JT808MultimediaCodingFormat">
             <summary>
             多媒体格式编码
@@ -2685,6 +2691,30 @@
         <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF800)">
             <summary>
             0xF800 - CAN总线数据下发
+            auto-generated 2019 version
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create_读卡器指令上传(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF900)">
+            <summary>
+            0xF900 - 读卡器指令上传
+            auto-generated
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF900)">
+            <summary>
+            0xF900 - 读卡器指令上传
+            auto-generated
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create_读卡器指令上传_2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF900)">
+            <summary>
+            0xF900 - 读卡器指令上传
+            auto-generated 2019 version
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.Extensions.JT808PackageExtensions.Create2019(JT808.Protocol.Enums.JT808MsgId,System.String,JT808.Protocol.MessageBody.JT808_0xF900)">
+            <summary>
+            0xF900 - 读卡器指令上传
             auto-generated 2019 version
             </summary>
         </member>
@@ -18649,6 +18679,53 @@
             <returns></returns>
         </member>
         <member name="M:JT808.Protocol.MessageBody.JT808_0xF800.Serialize(JT808.Protocol.MessagePack.JT808MessagePackWriter@,JT808.Protocol.MessageBody.JT808_0xF800,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="config"></param>
+        </member>
+        <member name="T:JT808.Protocol.MessageBody.JT808_0xF900">
+            <summary>
+            读卡器指令上传
+            808规定0xF000~0xFFFF为厂商自定义下行消息
+            仅为了编程方便而设计，实际上设备并不会真的发送此类指令
+            </summary>
+            <remarks>Added by WuXuehui</remarks>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF900.MsgId">
+            <summary>
+            0xF900
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF900.Description">
+            <summary>
+            CAN总线数据上传
+            </summary>
+        </member>
+        <member name="P:JT808.Protocol.MessageBody.JT808_0xF900.ScannerInstr">
+            <summary>
+            读卡器指令
+            </summary>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF900.Analyze(JT808.Protocol.MessagePack.JT808MessagePackReader@,System.Text.Json.Utf8JsonWriter,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="writer"></param>
+            <param name="config"></param>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF900.Deserialize(JT808.Protocol.MessagePack.JT808MessagePackReader@,JT808.Protocol.IJT808Config)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="config"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JT808.Protocol.MessageBody.JT808_0xF900.Serialize(JT808.Protocol.MessagePack.JT808MessagePackWriter@,JT808.Protocol.MessageBody.JT808_0xF900,JT808.Protocol.IJT808Config)">
             <summary>
             
             </summary>

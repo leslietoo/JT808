@@ -367,5 +367,11 @@ namespace JT808.Protocol.Enums
         ///  0x0802
         /// </summary>
         存储多媒体数据检索应答 = 0x0802,
+
+        /// <summary>
+        /// 读卡器指令上传
+        /// 0xF900
+        /// </summary>
+        读卡器指令上传 = 0xF900,
     }
 }
