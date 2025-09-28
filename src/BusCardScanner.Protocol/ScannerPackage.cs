@@ -81,7 +81,7 @@ namespace Scanner.Protocol
             //  3.4.读取读卡器ID
             scannerPackage.Header.ScannerId = reader.ReadString(16);
             //  3.5.读取消息体长度
-            scannerPackage.Header.MsgBodyLen = reader.ReadUInt16();
+            scannerPackage.Header.MsgBodyLen = reader.ReadUInt32();
             // 4.处理数据体
             //  4.1.判断有无数据体
             if (scannerPackage.Header.MsgBodyLen > 0)

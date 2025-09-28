@@ -13,9 +13,10 @@ namespace Scanner.Protocol.Extensions
         /// <typeparam name="TScannerBodies"></typeparam>
         /// <param name="msgId"></param>
         /// <param name="scannerId"></param>
+        /// <param name="protocolVersion"></param>
         /// <param name="bodies"></param>
         /// <returns></returns>
-        public static ScannerPackage Create<TScannerBodies>(this ScannerMsgId msgId, string scannerId, TScannerBodies bodies)
+        public static ScannerPackage Create<TScannerBodies>(this ScannerMsgId msgId, string scannerId, byte protocolVersion, TScannerBodies bodies)
             where TScannerBodies : ScannerBodies
         {
             ScannerPackage scannerPackage = new ScannerPackage
@@ -24,6 +25,7 @@ namespace Scanner.Protocol.Extensions
                 {
                     MsgId = (byte)msgId,
                     ScannerId = scannerId,
+                    ProtocolVersion = protocolVersion,
                 },
                 Bodies = bodies
             };
@@ -34,8 +36,9 @@ namespace Scanner.Protocol.Extensions
         /// </summary>
         /// <param name="msgId"></param>
         /// <param name="scannerId"></param>
+        /// <param name="protocolVersion"></param>
         /// <returns></returns>
-        public static ScannerPackage Create(this ScannerMsgId msgId, string scannerId)
+        public static ScannerPackage Create(this ScannerMsgId msgId, string scannerId, byte protocolVersion)
         {
             ScannerPackage scannerPackage = new ScannerPackage
             {
@@ -43,6 +46,7 @@ namespace Scanner.Protocol.Extensions
                 {
                     MsgId = (byte)msgId,
                     ScannerId = scannerId,
+                    ProtocolVersion = protocolVersion,
                 }
             };
             return scannerPackage;
@@ -53,9 +57,10 @@ namespace Scanner.Protocol.Extensions
         /// <typeparam name="TScannerBodies"></typeparam>
         /// <param name="msgId"></param>
         /// <param name="scannerId"></param>
+        /// <param name="protocolVersion"></param>
         /// <param name="bodies"></param>
         /// <returns></returns>
-        public static ScannerPackage CreateCustomMsgId<TScannerBodies>(this byte msgId, string scannerId, TScannerBodies bodies)
+        public static ScannerPackage CreateCustomMsgId<TScannerBodies>(this byte msgId, string scannerId, byte protocolVersion, TScannerBodies bodies)
             where TScannerBodies : ScannerBodies
         {
             ScannerPackage scannerPackage = new ScannerPackage
@@ -63,7 +68,8 @@ namespace Scanner.Protocol.Extensions
                 Header = new ScannerHeader
                 {
                     MsgId = msgId,
-                    ScannerId = scannerId
+                    ScannerId = scannerId,
+                    ProtocolVersion = protocolVersion,
                 },
                 Bodies = bodies
             };
@@ -74,15 +80,17 @@ namespace Scanner.Protocol.Extensions
         /// </summary>
         /// <param name="msgId"></param>
         /// <param name="scannerId"></param>
+        /// <param name="protocolVersion"></param>
         /// <returns></returns>
-        public static ScannerPackage CreateCustomMsgId(this byte msgId, string scannerId)
+        public static ScannerPackage CreateCustomMsgId(this byte msgId, string scannerId, byte protocolVersion)
         {
             ScannerPackage scannerPackage = new ScannerPackage
             {
                 Header = new ScannerHeader
                 {
                     MsgId = msgId,
-                    ScannerId = scannerId
+                    ScannerId = scannerId,
+                    ProtocolVersion = protocolVersion,
                 }
             };
             return scannerPackage;

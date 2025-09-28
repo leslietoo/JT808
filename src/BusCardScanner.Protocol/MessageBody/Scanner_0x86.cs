@@ -30,7 +30,12 @@ namespace Scanner.Protocol.MessageBody
         public ScannerUpgradeType UpgradeType { get; set; }
 
         /// <summary>
-        /// 升级数据包
+        /// 升级文件可能会被切割后分多次发送，该字段表示本次发送的数据包的起始字节在升级文件里的偏移量
+        /// </summary>
+        public int Offset { get; set; }
+
+        /// <summary>
+        /// 升级数据包，最大512字节。最后一包的长度如果不是4的倍数，需要用FF填充至4的倍数。
         /// </summary>
         public byte[] Firmware { get; set; }
 
