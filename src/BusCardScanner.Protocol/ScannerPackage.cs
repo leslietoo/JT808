@@ -79,7 +79,8 @@ namespace Scanner.Protocol
             //  3.3.读取协议版本号
             scannerPackage.Header.ProtocolVersion = reader.ReadByte();
             //  3.4.读取读卡器ID
-            scannerPackage.Header.ScannerId = reader.ReadString(16);
+            //scannerPackage.Header.ScannerId = reader.ReadString(16);
+            scannerPackage.Header.ScannerId = reader.ReadArray(16).ToArray().ToHexString();
             //  3.5.读取消息体长度
             scannerPackage.Header.MsgBodyLen = reader.ReadUInt32();
             // 4.处理数据体

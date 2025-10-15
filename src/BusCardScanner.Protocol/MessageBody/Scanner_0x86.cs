@@ -35,7 +35,7 @@ namespace Scanner.Protocol.MessageBody
         public int Offset { get; set; }
 
         /// <summary>
-        /// 升级数据包，最大512字节。最后一包的长度如果不是4的倍数，需要用FF填充至4的倍数。
+        /// 升级数据包，最大4K字节。最后一包的长度如果不是4的倍数，需要用FF填充至4的倍数。
         /// </summary>
         public byte[] Firmware { get; set; }
 
@@ -49,6 +49,7 @@ namespace Scanner.Protocol.MessageBody
         {
             Scanner_0x86 scanner_0x86 = new Scanner_0x86();
             scanner_0x86.UpgradeType = (ScannerUpgradeType)reader.ReadByte();
+            scanner_0x86.Offset = reader.ReadInt32();
 
             var firmwareLen = reader.ReadInt32();
             if (firmwareLen > 0)
@@ -65,6 +66,7 @@ namespace Scanner.Protocol.MessageBody
         public void Serialize(ref ScannerMessagePackWriter writer, Scanner_0x86 value, IScannerConfig config)
         {
             writer.WriteByte((byte)value.UpgradeType);
+            writer.WriteInt32(value.Offset);
 
             if (value.Firmware == null || value.Firmware.Length == 0)
             {

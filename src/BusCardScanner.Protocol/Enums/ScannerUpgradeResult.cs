@@ -8,13 +8,13 @@ namespace Scanner.Protocol.Enums
     public enum ScannerUpgradeResult : byte
     {
         /// <summary>
-        /// 成功
+        /// 升级成功
         /// </summary>
         [Description("succeed")]
         Succeed = 0x00,
 
         /// <summary>
-        /// 失败
+        /// 分包数据有错或升级失败
         /// </summary>
         [Description("failed")]
         Fail = 0x01,
@@ -48,5 +48,11 @@ namespace Scanner.Protocol.Enums
         /// </summary>
         [Description("unsupported firmware version")]
         UnsupportedFirmwareVersion = 0x06,
+
+        /// <summary>
+        /// 分包数据接收成功
+        /// </summary>
+        [Description("sub-package received OK")]
+        SubPackageReceivedOK = 0x07,
     }
 }

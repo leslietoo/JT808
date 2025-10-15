@@ -10,7 +10,7 @@ using System.Globalization;
 namespace Scanner.Protocol.MessageBody
 {
     /// <summary>
-    /// 升级结果通知
+    /// 升级分包消息应答/升级结果通知
     /// </summary>
     public class Scanner_0x06 : ScannerBodies,IScannerMessagePackFormatter<Scanner_0x06>, IScannerAnalyze, IScannerWithReplyMsgNum, IScannerSendTime
     {
@@ -42,13 +42,14 @@ namespace Scanner.Protocol.MessageBody
 
         /// <summary>
         /// 升级结果:
-        /// 0x00：成功
-        /// 0x01：失败
+        /// 0x00：升级成功
+        /// 0x01：分包数据有错或升级失败
         /// 0x02：无效的升级包
         /// 0x03：未找到目标部件
         /// 0x04：硬件型号不支持
         /// 0x05：软件版本相同
         /// 0x06：软件版本不支持
+        /// 0x07：分包数据接收成功
         /// </summary>
         public ScannerUpgradeResult UpgradeResult { get; set; }
 
@@ -56,6 +57,11 @@ namespace Scanner.Protocol.MessageBody
         /// 升级结果详细信息，最多255个字节
         /// </summary>
         public string UpgradeDetail { get; set; }
+
+        /// <summary>
+        /// 本消息是属于升级分包消息应答还是升级结果
+        /// </summary>
+        public UpgradeAckType AckType { get; set; }
 
         /// <summary>
         /// 
@@ -110,5 +116,28 @@ namespace Scanner.Protocol.MessageBody
         {
             throw new NotImplementedException("Analyzer is not available yet.");
         }
+
+        #region Classes
+        /// <summary>
+        /// 本消息是属于升级分包消息应答还是升级结果
+        /// </summary>
+        public enum UpgradeAckType : byte
+        {
+            /// <summary>
+            /// 未知
+            /// </summary>
+            Unknown = 0x00,
+
+            /// <summary>
+            /// 分包应答
+            /// </summary>
+            SubPkgAck = 0x01,
+
+            /// <summary>
+            /// 升级结果
+            /// </summary>
+            UpgradeResult = 0x02,
+        }
+        #endregion Classes
     }
 }
